@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Единый скрипт продаж B2B — ГК «Альфа-КПД»</title>
+<style>
+:root{
+  --blue:#1d4ed8; --blue-d:#0f2a6b; --orange:#ea580c;
+  --ink:#0f172a; --ink2:#475569; --bg:#f3f6fb; --line:#e2e8f0;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:15px; line-height:1.5}
+.wrap{max-width:1000px; margin:0 auto; padding:0 16px}
+/* ===== ШАПКА С ЛОГОТИПОМ ===== */
+header{background:linear-gradient(135deg,#0c1f52 0%,#1d4ed8 100%); color:#fff; padding:26px 0 22px}
+.header-row{display:flex;align-items:center;gap:18px}
+.brand-logo{height:56px;width:auto;display:block;flex:none;background:transparent;border:none;outline:none;box-shadow:none;mix-blend-mode:screen}
+.header-copy{display:flex;flex-direction:column;gap:2px}
+.header-copy h1{margin:0;font-size:23px;font-weight:800;letter-spacing:.2px}
+.header-copy .sub{margin:0;opacity:.85;font-size:14px}
+/* ===== МЕНЮ ВКЛАДОК: БЕЗ ПОЛУЗУНКА, В ДВА РЯДА ===== */
+nav{position:sticky; top:0; z-index:60; background:rgba(243,246,251,.96); backdrop-filter:blur(6px); border-bottom:1px solid var(--line)}
+nav .wrap{display:flex; gap:8px; flex-wrap:wrap; padding-top:10px; padding-bottom:10px}
+nav button{white-space:nowrap; border:1px solid var(--line); background:#fff; color:var(--ink2); font-weight:700; font-size:14px; padding:9px 16px; border-radius:999px; cursor:pointer}
+nav button.active{background:var(--blue); border-color:var(--blue); color:#fff}
+.tab{display:none; padding:20px 0 60px}
+.tab.active{display:block}
+.card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.intro ul{margin:8px 0 0 18px}
+.intro li{margin:4px 0; color:var(--ink2); font-size:14px}
+.legend-title{font-weight:800; font-size:13px; text-transform:uppercase; letter-spacing:.5px; color:var(--ink2); margin-bottom:8px}
+.legend-items{display:flex; flex-direction:column; align-items:flex-start; gap:8px; font-size:13px; color:var(--ink2)}
+.legend-items i{font-style:normal; margin-right:6px}
+/* ===== ЗАКРЕПЛЁННАЯ ПАНЕЛЬ ===== */
+.stickybar{position:sticky; top:61px; z-index:45; background:var(--bg); padding:10px 0 10px; box-shadow:0 12px 14px -14px rgba(15,23,42,.35)}
+.tools{display:flex; gap:10px; flex-wrap:wrap; margin:0 0 8px; align-items:center}
+#search{flex:1; min-width:200px; border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:14px; background:#fff}
+.tb{border:1px solid var(--line); background:#fff; border-radius:10px; padding:10px 14px; font-size:14px; font-weight:700; color:var(--ink2); cursor:pointer; white-space:nowrap}
+.tb:hover{border-color:var(--blue); color:var(--blue)}
+.chips{display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto; margin:0 0 8px; padding-bottom:2px}
+.chip{border:1px solid var(--line); background:#fff; border-radius:999px; padding:7px 14px; font-size:13px; font-weight:600; color:var(--ink2); cursor:pointer; white-space:nowrap}
+.chip.active{background:var(--blue-d); border-color:var(--blue-d); color:#fff}
+.stagenav{display:flex; gap:6px; overflow-x:auto; padding-bottom:2px}
+.stn{border:1px solid var(--line); background:#fff; border-radius:999px; padding:6px 12px; font-size:12.5px; font-weight:700; color:var(--ink2); cursor:pointer; white-space:nowrap}
+.stn:hover{border-color:var(--blue); color:var(--blue)}
+/* ===== ЭТАПЫ ===== */
+.stage{background:#fff; border:1px solid var(--line); border-radius:14px; margin-bottom:12px; overflow:hidden; scroll-margin-top:215px}
+.stage-head{width:100%; display:flex; align-items:center; gap:12px; padding:14px 16px; background:none; border:0; cursor:pointer; text-align:left}
+.stage-num{width:34px;height:34px;border-radius:50%;background:var(--blue-d);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;font-size:15px}
+.stage-title{font-size:16.5px;font-weight:800;flex:1}
+.stage-count{font-size:12.5px;color:var(--ink2);white-space:nowrap}
+.chev{transition:transform .2s;color:#94a3b8;flex:none}
+.open > .stage-head .chev, .open > .item-head .chev{transform:rotate(180deg)}
+.stage-body{display:none;border-top:1px solid var(--line);padding:12px;background:#f8fafc}
+.stage.open .stage-body{display:block}
+.item{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.item:last-child{margin-bottom:0}
+.item-head{width:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 14px;background:none;border:0;cursor:pointer;text-align:left}
+.item-head:hover{background:#f8fafc}
+.item-num{font-weight:800;font-size:12px;color:#94a3b8;min-width:30px}
+.scenario{font-weight:800;font-size:13.5px;color:var(--blue-d)}
+.item-goal{flex:1;min-width:180px;font-size:13.5px;color:var(--ink2)}
+.item-body{display:none;border-top:1px dashed var(--line);padding:14px}
+.item.open .item-body{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.block{border-radius:10px;padding:11px 13px;margin-bottom:10px;font-size:14px}
+.block:last-child{margin-bottom:0}
+.block h5{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.b-action{background:#f1f5f9}.b-action h5{color:#475569}
+.b-result{background:#f0fdf4;border-left:3px solid #16a34a}.b-result h5{color:#15803d}
+.b-phrase{background:#fff7ed;border-left:3px solid var(--orange)}.b-phrase h5{color:#c2410c}
+.b-ctrl{background:#fef2f2;border-left:3px solid #dc2626}.b-ctrl h5{color:#b91c1c}
+.phrase-text{font-size:15px;line-height:1.55;white-space:pre-line}
+.copy{margin-left:auto;border:1px solid #fdba74;background:#fff;color:#c2410c;font-size:11.5px;font-weight:700;border-radius:7px;padding:4px 10px;cursor:pointer}
+.copy.ok{background:#16a34a;border-color:#16a34a;color:#fff}
+.badge{display:inline-block; font-size:11px; font-weight:800; letter-spacing:.3px; padding:3px 9px; border-radius:999px; white-space:nowrap}
+.b-req{background:#fee2e2;color:#b91c1c}.b-ext{background:#ede9fe;color:#6d28d9}
+.b-str{background:#cffafe;color:#0e7490}.b-rule{background:#e2e8f0;color:#475569}
+.b-var{background:#dbeafe;color:#1d4ed8}.b-br{background:#fef3c7;color:#b45309}
+.b-mod{background:#e0f2fe;color:#0369a1}.b-obj{background:#ffedd5;color:#c2410c}
+.b-close{background:#dcfce7;color:#15803d}.b-add{background:#f1f5f9;color:#64748b}
+/* ===== БЫСТРЫЕ ОТВЕТЫ ===== */
+.quick{margin-bottom:10px}
+.q-head{width:100%;display:flex;align-items:center;gap:10px;padding:14px 16px;background:none;border:0;cursor:pointer;text-align:left;font-size:15.5px;font-weight:800}
+.q-head:hover{background:#f8fafc}
+.q-icon{width:32px;height:32px;border-radius:9px;background:#ffedd5;color:#c2410c;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+.q-body{display:none;border-top:1px dashed var(--line);padding:14px}
+.quick.open .q-body{display:block}
+.q-why{background:#f1f5f9;border-radius:10px;padding:10px 13px;margin-bottom:10px;font-size:14px}
+.q-why b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#475569;margin-bottom:3px}
+/* ===== ШАБЛОНЫ ЧАТОВ ===== */
+.tpl-stage{font-size:17px;font-weight:800;margin-bottom:8px;color:var(--blue-d)}
+.tpl-note{background:#f1f5f9;border-radius:10px;padding:10px 13px;font-size:13.5px;color:var(--ink2);margin-bottom:10px}
+.tpl-points{font-weight:700;font-size:13.5px;margin-bottom:10px;color:var(--blue-d)}
+/* ===== ЗАПРОС КОНТАКТОВ ===== */
+.contact-section{margin-bottom:24px}
+.contact-section h2{font-size:19px;font-weight:800;color:var(--blue-d);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+.contact-card{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.contact-head{width:100%;display:flex;align-items:center;gap:10px;padding:14px 16px;background:none;border:0;cursor:pointer;text-align:left;font-size:15px;font-weight:800}
+.contact-head:hover{background:#f8fafc}
+.contact-num{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;font-size:14px}
+.contact-title{flex:1;color:var(--ink)}
+.contact-body{display:none;border-top:1px dashed var(--line);padding:14px}
+.contact-card.open .contact-body{display:block}
+.contact-action{background:#eef4ff;border-radius:10px;padding:10px 13px;margin-bottom:10px;font-size:14px;color:var(--blue-d)}
+.contact-action b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.contact-variant{background:#fef3c7;border-left:3px solid #f59e0b;border-radius:8px;padding:10px 13px;margin:10px 0;font-size:13.5px;color:#92400e;white-space:pre-line}
+.contact-variant b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+/* ===== СТОП-ЛИСТ ===== */
+.stop-card{display:flex;gap:14px;margin-bottom:10px}
+.stop-num{width:36px;height:36px;border-radius:50%;background:#fee2e2;color:#b91c1c;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
+.stop-main{flex:1}
+.stop-bad{font-weight:800;color:#b91c1c;font-size:15px;margin-bottom:6px}
+.stop-why{font-size:13.5px;color:var(--ink2)}
+/* ===== ШПАРГАЛКА ===== */
+.cheat-note{margin-bottom:16px}
+.step{display:flex;gap:14px;margin-bottom:10px}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
+.step-main{flex:1}
+.step-title{font-weight:800;margin-bottom:6px}
+.step-do{font-size:13.5px;color:var(--ink2);margin-bottom:8px}
+.step-res{display:inline-block;background:#dcfce7;color:#166534;border-radius:8px;font-size:12.5px;font-weight:600;padding:4px 10px;margin-top:8px}
+/* ===== ОЦЕНКА ===== */
+.score-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.meta-grid input{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14px;background:#fff}
+.crit-row{display:grid;grid-template-columns:34px 1fr auto;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.crit-num{width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:#334155;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.crit-block{font-weight:800;font-size:13.5px}
+.crit-w{font-weight:600;font-size:11.5px;color:#94a3b8;margin-left:6px}
+.crit-text{font-size:13.5px;color:var(--ink2);margin-top:2px}
+.crit-comm{width:100%;margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit}
+.crit-score{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.sbtns{display:flex;gap:6px}
+.sbtn{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:#f8fafc;font-weight:800;cursor:pointer;font-size:14px}
+.sbtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.crit-pts{font-weight:800;font-size:12.5px;color:var(--ink2);white-space:nowrap}
+.score-panel{position:sticky;top:66px}
+.score-big{font-size:40px;font-weight:900;line-height:1}
+.score-big span{font-size:17px;color:#94a3b8;font-weight:700}
+.score-bar{height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin:12px 0}
+.score-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#16a34a,#84cc16);transition:width .25s}
+.score-level{font-weight:800;border-radius:10px;padding:9px 12px;text-align:center;font-size:14px}
+.lv-none{background:#f1f5f9;color:#64748b}.lv-hi{background:#dcfce7;color:#14532d}
+.lv-ok{background:#d1fae5;color:#065f46}.lv-mid{background:#fef3c7;color:#92400e}.lv-low{background:#fee2e2;color:#7f1d1d}
+.score-hint{font-size:12px;color:#94a3b8;margin-top:10px}
+.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:800;font-size:14px;cursor:pointer}
+.btn-p{background:var(--blue);color:#fff;width:100%;margin-top:12px}
+.btn-g{background:#f1f5f9;color:#475569;width:100%;margin-top:8px}
+h3.sec{font-size:17px;margin:22px 0 10px}
+.critm-row{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:14px}
+.mbtns{display:flex;gap:6px;flex:none}
+.mbtn{padding:8px 16px;border-radius:9px;border:1px solid var(--line);background:#f8fafc;font-weight:800;cursor:pointer;font-size:13px}
+.mbtn.no.on{background:#dcfce7;border-color:#16a34a;color:#14532d}
+.mbtn.yes.on{background:#fee2e2;border-color:#dc2626;color:#7f1d1d}
+.crit-banner{border-radius:12px;padding:12px 16px;font-weight:700;font-size:14px;margin:12px 0}
+.crit-banner.neutral{background:#f1f5f9;color:#64748b}
+.crit-banner.good{background:#dcfce7;color:#14532d}
+.crit-banner.bad{background:#fee2e2;color:#7f1d1d}
+textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;min-height:70px}
+footer{text-align:center;color:#94a3b8;font-size:12.5px;padding:26px 0 40px}
+@media(max-width:760px){
+  .grid2{grid-template-columns:1fr}
+  .score-layout{grid-template-columns:1fr}
+  .score-panel{position:static}
+  .crit-row{grid-template-columns:1fr}
+  .crit-score{flex-direction:row;align-items:center;justify-content:space-between;width:100%}
+  .stage{scroll-margin-top:265px}
+  .brand-logo{height:44px}
+  .header-row{gap:12px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <img class="brand-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAa4AAABLCAMAAAAf1ZMtAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABOFBMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7////+/v3///7a2tn///7///63t7b////q6OL9/Pr///3////+/v7f393IyMe3t7by7uKTk5L///7////38d/+/vz53ozX19efn56/v754eHf88Mr39vHd3d3///6JiYj5342qqqlqamn76rX30V/59eePj47Y2NfCwsF5eXhdXVympqX64pr30mP1yUJpaWhTU1KNjYz1xzpOTkz302Zzc3JgYF5EREP0wio8PDr0wy1QUE9CQkE4ODcxMTDzvRkrKyomJiTxtgEhISAdHRsbGxl9AEq7AAAAZnRSTlMAAQIDBAUGCAoNDxEUFxkbHR4hJCYoKi0wMjU3Ojw/QkRHS1BUVlldXmBjZmlvdnd5eXp8foWJjY2OkZeXmJ6fo6Smpquus7W2u7q/wMPGyMvKz9XY29zf4eHi5evr7fDz9ff7//6ck/jyAAAkY0lEQVR42ux8CXMbObJmJoBi8T4kipIttzX2zIt4G/H2//+OjY19O2/6mFa3L9k6eIhHsQqZayQOVYns7p15MxHvRXRaLBYLVyI/ZCKRQBl+p/9OhP+Qgoz8uyj/a8KFrgzGGwAGjtffMfsvBZcghPIHGAuz/zDL369Bho3m+Hd0/4lwRaACYuAvSe7s/zkCPo4U+msoIuD+Dtg/By4EdORlrqCuXQmq8MdyPaqS2CjBzL/j9Q+GK4Gl3EWgkl+AqShDFL3/NBGT7P6SNDJkpd/x+ifAhZFAuY9KoIEngYaAmZifcCNgX38TaF9CSArQ38s0/3cWOP9GFv674cJIyl203IjoMbTclD7XyaPl/pTApqQ9BopZiZgP2cHQn+dJ+IxlPrz5R8msyQn/f9XIh8V/Rdr8dGVsFmmm898Al6hUAEt9JflGIQgUbKBA4K5UhwtSYfknhQQmIiaf+7kzA40JMaVIaugR1/VLmmGMAP+2b4oQif3f0W4fcnKcQkasyxb9X2oEaz+R5RNZ53o1te5xTG82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" alt="Альфа-КПД — группа компаний">
+    <div class="header-copy">
+      <h1>Единый скрипт продаж B2B</h1>
+      <div class="sub">Поставки товаров из КНР: техника, оборудование, запчасти и товары для бизнеса</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <button class="active" data-tab="script" onclick="showTab('script')">📞 Скрипт разговора</button>
+    <button data-tab="quick" onclick="showTab('quick')">⚡ Быстрые ответы</button>
+    <button data-tab="tpl" onclick="showTab('tpl')">💬 Шаблоны для чатов</button>
+    <button data-tab="contacts" onclick="showTab('contacts')">📱 Запрос контактов</button>
+    <button data-tab="stop" onclick="showTab('stop')">🚫 Стоп-лист фраз</button>
+    <button data-tab="cheat" onclick="showTab('cheat')">📌 Шпаргалка: 15 шагов</button>
+    <button data-tab="score" onclick="showTab('score')">✅ Оценка звонка</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ================= СКРИПТ ================= -->
+<section class="tab active" id="tab-script">
+  <div class="card intro">
+    <b>Как пользоваться</b>
+    <ul>
+      <li>Скрипт — это каркас разговора, а не текст для чтения слово в слово.</li>
+      <li>Используйте только подтверждённые факты, цены, сроки, наличие, гарантии и спецусловия.</li>
+      <li>Каждый контакт заканчивается конкретным следующим шагом: кто, что и к какому времени делает; дата и время фиксируются в CRM.</li>
+    </ul>
+    <div class="legend-title" style="margin-top:14px">Уровни скрипта</div>
+    <div class="legend-items">
+      <span><i class="badge b-req">Обязательный</i>минимум каждого разговора — уровень проходит каждый первый содержательный разговор</span>
+      <span><i class="badge b-ext">Расширенный</i>выявляется потребность, боли, критерии — для качественного расчёта и сделки</span>
+      <span><i class="badge b-str">Стратегический</i>выявляет потенциал клиента — для ключевых клиентов и развития портфеля</span>
+      <span><i class="badge b-rule">Правило</i>не задавайте вопросы списком: связывайте следующий вопрос с ответом клиента</span>
+      <span><i class="badge b-br">Вариант / Развилка</i>применяется по ситуации</span>
+    </div>
+  </div>
+
+  <div class="stickybar">
+    <div class="tools">
+      <input id="search" type="search" placeholder="🔍 Поиск по скрипту: «Дорого», «КП», «дедлайн», «ЛПР»…" oninput="query=this.value.toLowerCase().trim();applyFilter()">
+      <button class="tb" onclick="expandAll()" title="Открыть все этапы и пункты">▸ Развернуть все</button>
+      <button class="tb" onclick="collapseAll()" title="Закрыть все открытые этапы, пункты и карточки ситуаций">▾ Свернуть все</button>
+    </div>
+    <div class="chips">
+      <button class="chip active" data-f="all" onclick="setFilter('all')">Все</button>
+      <button class="chip" data-f="req" onclick="setFilter('req')">Обязательный</button>
+      <button class="chip" data-f="extstr" onclick="setFilter('extstr')">Расширенный + Стратегический</button>
+    </div>
+    <div class="stagenav" id="stagenav"></div>
+  </div>
+
+  <div id="stages"></div>
+</section>
+
+<!-- ================= БЫСТРЫЕ ОТВЕТЫ ================= -->
+<section class="tab" id="tab-quick">
+  <div class="card intro" style="margin-bottom:16px">
+    <b>Быстрые варианты на сложные ситуации.</b>
+    <span style="color:var(--ink2);font-size:14px"> Кликните на ситуацию — получите готовую формулировку, цель и контроль. Кнопка «Свернуть все» (на вкладке «Скрипт») закрывает и эти карточки.</span>
+  </div>
+  <div id="quick"></div>
+</section>
+
+<!-- ================= ШАБЛОНЫ ДЛЯ ЧАТОВ ================= -->
+<section class="tab" id="tab-tpl">
+  <div class="card intro" style="margin-bottom:16px">
+    <b>Шаблоны ответов для чатов по стадиям сделки.</b>
+    <span style="color:var(--ink2);font-size:14px"> Выбирайте вариант под ситуацию и копируйте кнопкой. Приоритет — звонок; сообщение отправляйте, если до клиента не дозвонились.</span>
+  </div>
+  <div id="tpl"></div>
+</section>
+
+<!-- ================= ЗАПРОС КОНТАКТОВ ================= -->
+<section class="tab" id="tab-contacts">
+  <div class="card intro" style="margin-bottom:16px">
+    <b>Шаблоны запроса контактов в чатах и по почте.</b>
+    <span style="color:var(--ink2);font-size:14px"> Готовые формулировки для перевода диалога из переписки в звонок или мессенджер. Копируйте кнопкой и адаптируйте под ситуацию.</span>
+  </div>
+  <div id="contacts"></div>
+</section>
+
+<!-- ================= СТОП-ЛИСТ ================= -->
+<section class="tab" id="tab-stop">
+  <div class="card intro" style="margin-bottom:16px">
+    <b>Стоп-лист фраз в переписке и разговоре.</b>
+    <span style="color:var(--ink2);font-size:14px"> Эти формулировки не используем: они звучат слабо, резко или перекладывают вину на клиента. Рядом — проверенные замены (кнопка «Копировать»).</span>
+  </div>
+  <div id="stop"></div>
+</section>
+
+<!-- ================= ШПАРГАЛКА ================= -->
+<section class="tab" id="tab-cheat">
+  <div class="card intro cheat-note">
+    <b>Шпаргалка менеджера: 15 шагов разговора.</b>
+    <div style="color:var(--ink2);font-size:14px;margin-top:4px">Держите перед глазами во время звонка. Не читайте дословно — сохраняйте логику.<br>
+    <b style="color:#15803d">Минимальный результат разговора:</b> клиент квалифицирован, потребность понятна, следующий шаг согласован с датой и временем.</div>
+  </div>
+  <div id="cheat"></div>
+</section>
+
+<!-- ================= ОЦЕНКА ================= -->
+<section class="tab" id="tab-score">
+  <div class="card meta-grid">
+    <input id="sc-manager" placeholder="Менеджер">
+    <input id="sc-checker" placeholder="Проверяющий">
+    <input id="sc-client" placeholder="Клиент / лид">
+    <input id="sc-date" type="date" title="Дата звонка">
+  </div>
+  <div class="score-layout">
+    <div>
+      <div style="font-size:13px;color:var(--ink2);margin-bottom:10px"><b>Шкала:</b> 0 — не выполнено · 1 — выполнено частично/формально · 2 — выполнено качественно. Итог рассчитывается автоматически с учётом веса критерия.</div>
+      <div id="crit-list"></div>
+      <h3 class="sec">Критические ошибки</h3>
+      <div id="critm-list"></div>
+      <div class="crit-banner neutral" id="crit-banner">Отметьте каждый пункт: были ли критические ошибки.</div>
+      <h3 class="sec">Комментарий по итогам разбора</h3>
+      <textarea id="sc-comment" placeholder="Сильные стороны, зоны роста, договорённость по развитию…"></textarea>
+    </div>
+    <div class="card score-panel">
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8">Итоговый балл</div>
+      <div class="score-big" style="margin-top:6px"><span id="score-total">0</span> <span>/ 100</span></div>
+      <div class="score-bar"><i id="score-bar"></i></div>
+      <div class="score-level lv-none" id="score-level">Отметьте критерии</div>
+      <button class="btn btn-p" onclick="copySummary()">📋 Копировать итог оценки</button>
+      <button class="btn btn-g" onclick="resetScore()">Сбросить</button>
+      <div class="score-hint">Итог = Σ (оценка × вес ÷ 2). Уровень: ≥90 — высокий, 75–89 — хороший, 60–74 — удовлетворительный, ниже — переобучение.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>ГК «Альфа-КПД» • Единый скрипт продаж B2B • интерактивная версия для менеджеров</footer>
+
+<script>
+/* ================= ДАННЫЕ: ЭТАПЫ ================= */
+const STAGES=[
+{num:"0",title:"Подготовка",items:[
+{id:"0.1",lvl:"Обязательный",sc:"",goal:"Войти в разговор в контексте клиента.",action:"До звонка открыть карточку CRM: источник и дата заявки, конкретный товар/объявление, прошлые контакты и покупки, обещания коллег, город, известные реквизиты. Быстро посмотреть сайт компании клиента, если это уместно.",phrase:"Внутренняя установка менеджера: «Я знаю, кто клиент, по какому поводу обращался и что уже обсуждали».",result:"Определены контекст звонка и недостающие сведения.",control:"Ошибка: звонить вслепую, повторно спрашивать то, что уже есть в CRM, путать товар или историю клиента."},
+{id:"0.2",lvl:"Обязательный",sc:"",goal:"Заранее определить полезный результат контакта.",action:"Выбрать один основной результат звонка: получить ТЗ/артикулы/фото; квалифицировать заявку; согласовать расчёт; назначить техническую встречу; выставить счёт; вернуть клиента в активную работу.",phrase:"Внутренняя формулировка: «К концу звонка клиент и я должны понимать конкретный следующий шаг».",result:"Есть понятная цель разговора и запасной вариант следующего шага.",control:"Ошибка: разговаривать «просто узнать, как дела» без деловой цели."},
+{id:"0.3",lvl:"Правило",sc:"",goal:"Не создавать ожиданий, которые компания не сможет выполнить.",action:"Использовать только подтверждённые цены, сроки, наличие, гарантии, документы, скидки и условия оплаты. Если данных нет — зафиксировать, что именно уточните и к какому времени вернётесь.",phrase:"«Сейчас не буду называть случайную цифру. Уточню у закупки и логистики и вернусь с подтверждённым ответом сегодня до 16:00».",result:"Клиент получает точную информацию либо конкретный срок её предоставления.",control:"Критическая ошибка: обещать неподтверждённый срок, фиктивную скидку, «последнюю единицу» или гарантию, которой нет."}
+]},
+{num:"1",title:"Установление контакта",items:[
+{id:"1.1",lvl:"Вариант",sc:"входящая заявка",goal:"Персонализировать начало и получить согласие на разговор.",action:"Назвать клиента, себя, компанию, источник и предмет запроса; проверить, удобно ли говорить.",phrase:"«Добрый день, [Имя]. [Имя менеджера], ГК „Альфа-КПД“. Получили ваш запрос с [сайт/Авито/реклама] по [товар]. Удобно сейчас 5–7 минут, чтобы уточнить задачу и подобрать подходящий вариант?»",result:"Клиент понимает причину звонка и согласен продолжить.",control:"Не начинать с безличного «Чем могу помочь?», если предмет заявки уже известен."},
+{id:"1.2",lvl:"Вариант",sc:"повторный клиент / CRM",goal:"Вернуться в отношения без ощущения холодного обзвона.",action:"Напомнить контекст прошлой работы и назвать актуальный повод.",phrase:"«Добрый день, [Имя]. Это [менеджер], „Альфа-КПД“. Ранее мы [поставляли/обсуждали] для вас [товар]. Хочу уточнить планы по закупкам [категория] на ближайший период. Удобно сейчас коротко обсудить?»",result:"Восстановлен контекст, выявлена актуальность.",control:"Не делать вид, что отношения близкие, если в CRM был только один старый запрос."},
+{id:"1.3",lvl:"Вариант",sc:"рекомендация",goal:"Использовать доверие источника рекомендации.",action:"Назвать того, кто передал контакт, и кратко обозначить предполагаемую задачу.",phrase:"«Добрый день, [Имя]. Меня зовут [менеджер], ГК „Альфа-КПД“. Ваш контакт передал [имя/компания] и сказал, что у вас может быть задача по [категория]. Удобно уточнить несколько деталей?»",result:"Клиент подтвердил или скорректировал контекст.",control:"Не ссылаться на рекомендацию без разрешения рекомендателя и не преувеличивать её содержание."},
+{id:"1.4",lvl:"Вариант",sc:"холодный контакт",goal:"Быстро показать релевантность и снизить сопротивление.",action:"Связать профиль клиента с конкретной категорией поставок; запросить короткое разрешение на диагностику.",phrase:"«Добрый день, [Имя]. [Менеджер], „Альфа-КПД“. Вижу, ваша компания занимается [сфера]. Мы поставляем из Китая [релевантная техника/оборудование/запчасти] для таких задач. Удобно две минуты: поймём, есть ли смысл продолжать; если неактуально — не буду отвлекать?»",result:"Получено разрешение на 2–3 вопроса либо согласовано другое время.",control:"Ошибка: длинная презентация компании до того, как клиент подтвердил актуальность."},
+{id:"1.5",lvl:"Обязательный",sc:"",goal:"Понять, с кем говорим, и настроить обращение.",action:"Уточнить имя, должность/роль и удобство разговора. Если клиент сам представился — не переспрашивать.",phrase:"«Как могу к вам обращаться?» / «Вы отвечаете за подбор и закупку или подключены со стороны эксплуатации?» / «Сейчас удобно говорить?»",result:"В CRM есть имя, роль и удобный канал связи.",control:"Не задавать подряд три формальных вопроса. Встраивать их в естественный диалог."},
+{id:"1.6",lvl:"Развилка",sc:"клиент занят",goal:"Не потерять контакт и назначить точное время.",action:"Признать занятость и предложить два конкретных слота. Сразу поставить задачу в CRM.",phrase:"«Понял, не буду отвлекать. Что удобнее: сегодня после 16:00 или завтра до 11:00? Я позвоню ровно в согласованное время».",result:"Назначены дата и время повторного контакта.",control:"Ошибка: «Я тогда как-нибудь позже наберу» без даты и времени."}
+]},
+{num:"2",title:"Программирование разговора",items:[
+{id:"2.1",lvl:"Обязательный",sc:"",goal:"Получить право задавать вопросы и задать структуру разговора.",action:"Кратко объяснить, зачем нужны вопросы и что клиент получит после них.",phrase:"«Чтобы не присылать вам формальное КП и не тратить ваше время, я задам несколько вопросов по задаче, затем предложу подходящие варианты и согласуем следующий шаг. Хорошо?»",result:"Клиент согласился на формат разговора.",control:"Не использовать программирование как давление: клиент должен понимать пользу для себя."},
+{id:"2.2",lvl:"Вариант",sc:"клиент спешит",goal:"Сохранить структуру при коротком звонке.",action:"Сократить диагностику до обязательного минимума.",phrase:"«Уточню три момента — и сразу скажу, что можем сделать и когда дать точный расчёт. Договорились?»",result:"Есть разрешение на 3 ключевых вопроса.",control:"Не пытаться провести полный опрос, если клиент явно ограничен по времени."},
+{id:"2.3",lvl:"Развилка",sc:"сразу спрашивают цену",goal:"Не назвать случайную цену без исходных данных.",action:"Согласиться ответить и запросить минимальные параметры, от которых зависит стоимость.",phrase:"«Сориентирую по цене. Чтобы назвать корректную цифру, уточню [модель/характеристики], количество и город доставки. После этого скажу диапазон или срок точного расчёта».",result:"Получены параметры для корректной цены.",control:"Не уходить от вопроса о цене общими словами и не называть заведомо неподтверждённый диапазон."},
+{id:"2.4",lvl:"Развилка",sc:"«пришлите КП»",goal:"Сделать КП рабочим, а не формальным.",action:"Согласиться отправить и объяснить, какие данные нужны для сопоставимого предложения.",phrase:"«Отправлю. Чтобы КП можно было реально сравнить и согласовать, уточню четыре пункта: точную задачу, комплектацию, требуемый срок и адрес поставки. Это займёт пару минут».",result:"Согласованы параметры и формат КП.",control:"Ошибка: отправлять шаблонное КП без понимания задачи и без договорённости о его обсуждении."}
+]},
+{num:"3",title:"Квалификация и выявление потребности",items:[
+{id:"3.0",lvl:"Правило",sc:"",goal:"Собрать достаточно информации, не превращая разговор в анкетирование.",action:"Сначала пройти обязательный минимум. Расширенные вопросы задавать по логике ответа клиента; стратегические — когда есть доверие и потенциал развития.",phrase:"Переходы: «Чтобы правильно подобрать…» / «Вы сказали, что для вас важно…, тогда уточню…»",result:"Вопросы звучат связанно, клиент понимает их смысл.",control:"Ошибка: читать весь список подряд, перебивать и задавать вопрос, на который клиент только что ответил."},
+{id:"3.1",lvl:"Обязательный",sc:"",goal:"Понять профиль клиента и контекст применения.",action:"Уточнить название компании, отрасль и чем занимается объект/подразделение, для которого нужна поставка.",phrase:"«Как называется ваша компания?» / «В какой сфере работаете?» / «Для какого объекта или подразделения подбираем?»",result:"В CRM: компания, отрасль, объект/направление.",control:"Не задавать вопрос о компании, если реквизиты уже есть; лучше подтвердить: «Верно, что это ООО…?»"},
+{id:"3.2",lvl:"Обязательный",sc:"",goal:"Понять роль собеседника и карту принятия решения.",action:"Уточнить, кто формирует техническое решение, кто согласует цену, кто подписывает и оплачивает.",phrase:"«Вы отвечаете за подбор и закупку?» / «Кто ещё участвует в согласовании — механик, инженер, руководитель, бухгалтерия?» / «Кто принимает финальное решение?»",result:"В CRM: роль контакта, ЛПР, технический эксперт, согласующие.",control:"Не спрашивать в лоб «Вы ЛПР?»; формулировать через процесс решения."},
+{id:"3.3",lvl:"Обязательный",sc:"",goal:"Понять реальную задачу и причину обращения сейчас.",action:"Выяснить, что случилось, какую бизнес-задачу нужно решить и почему поиск начался именно сейчас.",phrase:"«Что именно нужно решить?» / «Что произошло, что вы начали искать поставщика сейчас?» / «Это поломка, плановая закупка, расширение или новый проект?»",result:"Зафиксированы задача и триггер.",control:"Не ограничиваться названием товара: один и тот же товар могут покупать для разных задач."},
+{id:"3.4",lvl:"Обязательный",sc:"",goal:"Получить точное описание товара или технического результата.",action:"Запросить наименование, модель, артикул, ТЗ, чертёж, фото, шильдик, ссылку либо требуемый результат, если готовой спецификации нет.",phrase:"«Есть точная модель/артикул/ТЗ?» / «Можете прислать фото шильдика, чертёж или перечень?» / «Если модели нет, какой результат должно обеспечивать решение?»",result:"Есть спецификация либо понятный список данных, которые клиент должен прислать.",control:"Критическая ошибка: рассчитывать «похожий» товар без проверки совместимости и ключевых параметров."},
+{id:"3.5",lvl:"Модуль",sc:"запчасти",goal:"Проверить совместимость и допустимый уровень аналога.",action:"Уточнить марку и модель машины, серийный номер, каталожный номер детали, фото, характер неисправности, оригинал/OEM/аналог, потребность поштучно или комплектом.",phrase:"«На какую машину нужна деталь: марка, модель, серийный номер?» / «Есть каталожный номер и фото?» / «Рассматриваете только оригинал или допустим качественный OEM/аналог?»",result:"Получены данные для идентификации и вариант качества.",control:"Не обещать совместимость только по разговорному названию детали."},
+{id:"3.6",lvl:"Модуль",sc:"техника / оборудование",goal:"Подобрать решение под эксплуатацию, а не только под название.",action:"Уточнить производительность, мощность/грузоподъёмность, сырьё или материал, режим работы, размеры, климат, площадку, питание, навесное оборудование и обязательные документы.",phrase:"«Для каких работ и в каких условиях будете использовать?» / «Какая нужна производительность/нагрузка?» / «Есть ограничения по габаритам, электропитанию, климату, документам?»",result:"Есть технический профиль применения.",control:"Не презентовать модель до подтверждения ключевых параметров."},
+{id:"3.7",lvl:"Обязательный",sc:"",goal:"Определить объём поставки и комплектацию.",action:"Уточнить количество, партии, комплектность, запас, расходники, монтаж/пусконаладку, упаковку и запасные части, если применимо.",phrase:"«Сколько единиц или какой объём нужен?» / «Нужна базовая комплектация или вместе с расходниками, ЗИП, монтажом?»",result:"В CRM: количество, комплектация, возможные опции.",control:"Ошибка: считать одну единицу, когда клиенту нужен проектный комплект."},
+{id:"3.8",lvl:"Обязательный",sc:"",goal:"Определить требования к качеству и документам.",action:"Уточнить предпочтительные и исключённые бренды, допустимость китайского бренда/OEM, гарантию, сертификацию, паспорта, ЭПТС/ПСМ и иные разрешительные документы — только если применимо.",phrase:"«Какие бренды рассматриваете или не рассматриваете?» / «Какие документы обязательны для приёмки и эксплуатации?» / «Что для вас будет подтверждением качества?»",result:"Сформирован перечень обязательных требований.",control:"Не обещать конкретный сертификат или регистрационный документ до проверки кода товара и схемы ввоза."},
+{id:"3.9",lvl:"Обязательный",sc:"",goal:"Понять логистическую задачу.",action:"Уточнить город и точный пункт назначения, необходимость доставки до двери, разгрузки, негабарита, особого маршрута или частичной поставки.",phrase:"«Куда должна прийти поставка: город, объект?» / «Нужна доставка до места, разгрузка или заберёте со склада/терминала?»",result:"В CRM: регион, адрес/объект, формат доставки.",control:"Не считать логистику только до границы, если клиент ждёт цену «до двери»."},
+{id:"3.10",lvl:"Обязательный",sc:"",goal:"Зафиксировать реальный дедлайн и срочность.",action:"Спросить желаемую дату, крайний допустимый срок и причину дедлайна. Разделить «хотелось бы» и «должно быть».",phrase:"«К какой дате товар должен быть у вас?» / «Какой самый поздний допустимый срок?» / «Что произойдёт, если поставка будет позже?»",result:"В CRM: желаемая дата, жёсткий дедлайн, причина срочности.",control:"Ошибка: записывать «срочно» без даты и последствий."},
+{id:"3.11",lvl:"Обязательный",sc:"",goal:"Понять финансовые рамки и формат цены.",action:"Уточнить бюджет или ориентир, нужна ли цена с НДС, что должно входить: товар, логистика, таможня, документы, монтаж.",phrase:"«Есть утверждённый бюджет или диапазон?» / «Цена нужна с НДС и доставкой до объекта?» / «Что обязательно должно входить в итоговую стоимость?»",result:"В CRM: бюджет/диапазон и состав цены.",control:"Не давить на клиента, если бюджета нет; предложить сравнить варианты по совокупной стоимости."},
+{id:"3.12",lvl:"Обязательный",sc:"",goal:"Понять способ закупки и оплаты.",action:"Уточнить прямая закупка, тендер, годовой договор, лизинг/кредит, этапность оплаты, сроки подачи КП и обязательные формы документов.",phrase:"«Как у вас обычно проходит закупка: напрямую, через тендер, под проект?» / «Есть срок подачи предложения?» / «Рассматриваете лизинг или поэтапную оплату, если это доступно?»",result:"В CRM: схема закупки, финансирование, дедлайн КП.",control:"Не обещать отсрочку, лизинг или график платежей без согласования."},
+{id:"3.13",lvl:"Обязательный",sc:"",goal:"Понять, как будет принято решение.",action:"Уточнить этапы согласования, критерии, участников и ожидаемую дату решения.",phrase:"«После получения КП что будет происходить дальше?» / «Кто и по каким критериям будет сравнивать варианты?» / «Когда планируете принять решение?»",result:"Есть карта решения и дата следующего контрольного события.",control:"Ошибка: закончить разговор на «пришлите, посмотрим» без процесса и срока."},
+{id:"3.14",lvl:"Расширенный",sc:"",goal:"Выявить приоритеты выбора.",action:"Попросить назвать 2–3 критерия и расставить их по важности.",phrase:"«Что для вас важнее всего при выборе: цена, срок, ресурс, гарантия, документы, сервис, условия оплаты? Какие три пункта решающие?»",result:"В CRM: критерии и приоритетность.",control:"Не предполагать, что для всех клиентов главным является минимальная цена."},
+{id:"3.15",lvl:"Расширенный",sc:"",goal:"Раскрыть проблему и бизнес-последствия.",action:"Уточнить, что не устраивает сейчас, как проблема влияет на производство, сроки, безопасность, деньги или репутацию.",phrase:"«Что сейчас не работает или не устраивает?» / «Как это влияет на ваш проект или производство?» / «Во что обходится простой или задержка?»",result:"Зафиксированы боль и последствия.",control:"Не драматизировать и не навязывать потери, которых клиент не подтверждал."},
+{id:"3.16",lvl:"Расширенный",sc:"",goal:"Понять предыдущий опыт и причины поиска нового решения.",action:"Уточнить, что использовали, у кого покупали, что было хорошо и что не устроило.",phrase:"«Как решали эту задачу раньше?» / «С кем сейчас работаете?» / «Что хотели бы изменить в поставщике или продукте?»",result:"Понятны ожидания и точки неудовлетворённости.",control:"Не критиковать конкурента без фактов."},
+{id:"3.17",lvl:"Расширенный",sc:"",goal:"Понять альтернативы и поле сравнения.",action:"Уточнить, какие компании, бренды или способы решения клиент рассматривает.",phrase:"«Какие ещё варианты сейчас сравниваете?» / «Есть уже КП конкурентов или внутреннее решение?» / «По каким пунктам будете сравнивать?»",result:"В CRM: альтернативы, конкуренты, база сравнения.",control:"Не требовать чужое КП; можно попросить обезличенные параметры для корректного сравнения."},
+{id:"3.18",lvl:"Расширенный",sc:"",goal:"Выявить риски и скрытые сомнения заранее.",action:"Спросить, чего клиент опасается в продукте, поставщике или поставке из Китая.",phrase:"«Что в такой закупке для вас самый большой риск?» / «Что должно быть подтверждено, чтобы вы чувствовали себя спокойно?»",result:"Зафиксированы страхи: срок, качество, документы, деньги, сервис, доверие.",control:"Не спорить со страхом и не отвечать до того, как выяснена его причина."},
+{id:"3.19",lvl:"Обязательный",sc:"",goal:"Согласовать канал и формат материалов.",action:"Уточнить удобный мессенджер/почту, адресата, формат КП, необходимость сравнительной таблицы, презентации, чертежей или сертификатов.",phrase:"«Куда удобнее направить материалы?» / «Кто будет их смотреть?» / «Что должно быть в КП, чтобы его смогли согласовать без доработки?»",result:"В CRM: канал, e-mail/мессенджер, формат и адресат.",control:"Ошибка: отправить документы не тому человеку или в неудобном формате."},
+{id:"3.20",lvl:"Стратегический",sc:"",goal:"Оценить весь парк и потенциал регулярных закупок.",action:"Уточнить перечень техники/оборудования, количество единиц, бренды, возраст и ключевые узлы.",phrase:"«Какая техника и оборудование у вас в парке?» / «Можете прислать перечень машин, чтобы мы оценили повторяющиеся позиции и критичный ЗИП?»",result:"В CRM/файлах: карта парка и потенциальные категории.",control:"Не просить большой массив данных без объяснения пользы для клиента."},
+{id:"3.21",lvl:"Стратегический",sc:"",goal:"Понять цикл дефектовок и закупок.",action:"Уточнить, кто и когда проводит дефектовку, как появляются заявки, закупают планово, по поломке, через тендер, под склад или сезонно.",phrase:"«Когда и кем проводятся дефектовки?» / «Как обычно закупаете замену: планово, по факту поломки, под склад, сезонно или через тендер?»",result:"Есть календарь и схема возникновения спроса.",control:"Соблюдать корректность при запросе контактов инженеров и механиков; получать согласие клиента."},
+{id:"3.22",lvl:"Стратегический",sc:"",goal:"Понять планы и сезонность.",action:"Уточнить проекты, расширение, сезонные пики и годовой план закупок.",phrase:"«Какие проекты и закупки планируются на ближайшие 6–12 месяцев?» / «Есть сезон, когда потребность резко растёт?»",result:"Зафиксированы будущие возможности и даты касаний.",control:"Не пытаться продать всё сразу; задача — построить карту будущего спроса."},
+{id:"3.23",lvl:"Стратегический",sc:"",goal:"Предложить управление складским запасом клиента.",action:"Выявить критичные позиции, частоту отказов и возможность сформировать запас на складе компании или под клиента.",phrase:"«Какие позиции чаще всего останавливают технику?» / «Имеет смысл сформировать перечень критичного ЗИП и заранее обеспечить наличие?»",result:"Появилась задача на анализ запаса/рамочный перечень.",control:"Не обещать резерв или складскую программу до внутреннего расчёта."},
+{id:"3.24",lvl:"Стратегический",sc:"",goal:"Найти смежные потребности без навязчивого апсейла.",action:"После закрытия основной задачи уточнить другие категории, которые можно объединить в закупке или логистике.",phrase:"«Кроме этой позиции, что ещё планируете закупать в тот же период?» / «Есть смежные товары, которые выгодно включить в одну поставку?»",result:"Зафиксированы дополнительные позиции или отсутствие потребности.",control:"Не уводить разговор от основной задачи до её полного прояснения."},
+{id:"3.25",lvl:"Стратегический",sc:"",goal:"Подключить технических участников.",action:"Согласовать контакт инженера/механика или совместный звонок, если без него нельзя подтвердить совместимость и ТЗ.",phrase:"«Чтобы не допустить ошибки в подборе, предлагаю подключить вашего технического специалиста на 15 минут. Когда удобно провести общий звонок?»",result:"Назначен технический контакт или встреча.",control:"Не обходить основного контактного лица и не писать другим сотрудникам без согласования."},
+{id:"3.26",lvl:"Дополнительный",sc:"обратная связь по маркетингу",goal:"Получить полезную обратную связь по маркетингу.",action:"Спрашивать после основной диагностики и только при нормальном контакте.",phrase:"«Кстати, откуда вы о нас узнали?» / «Что в объявлении или на сайте показалось наиболее релевантным?»",result:"В CRM: источник и мотив отклика.",control:"Не ставить маркетинговый вопрос выше потребности клиента."}
+]},
+{num:"4",title:"Резюмирование",items:[
+{id:"4.1",lvl:"Обязательный",sc:"",goal:"Показать, что менеджер услышал клиента, и проверить точность.",action:"Кратко собрать в одну фразу: товар/задача, параметры, количество, срок, место, приоритеты, бюджет/формат закупки и участники решения.",phrase:"«[Имя], подведу итог: вам нужен [товар/результат] для [задача], в количестве [ ], с ключевыми параметрами [ ], до [дата], доставка в [город]. Главные критерии — [1–3], решение согласуют [ ]. Всё верно?»",result:"Клиент подтвердил или скорректировал вводные.",control:"Ошибка: начинать презентацию, не сверив понимание задачи."},
+{id:"4.2",lvl:"Обязательный",sc:"",goal:"Закрыть пробелы до расчёта или презентации.",action:"После резюме спросить, что упущено, и зафиксировать недостающие материалы.",phrase:"«Что важное я не учёл?» / «Для точного подбора от вас ещё нужны [ТЗ/фото/артикулы/реквизиты]. Когда сможете направить?»",result:"Есть полный набор данных либо конкретный план их получения.",control:"Не маскировать отсутствие данных красивой презентацией."},
+{id:"4.3",lvl:"Обязательный",sc:"",goal:"Логично перейти к решению.",action:"Связать подтверждённую потребность с предложением или планом расчёта.",phrase:"«Тогда вижу два рабочих варианта. Сначала покажу, чем они отличаются по сроку, стоимости и рискам, затем выберем подходящий».",result:"Клиент готов слушать релевантную презентацию.",control:"Не переходить к длинному рассказу о компании без связи с запросом."}
+]},
+{num:"5",title:"Персонализированная презентация",items:[
+{id:"5.1",lvl:"Правило",sc:"",goal:"Продавать решение задачи, а не перечень характеристик.",action:"Использовать формулу: потребность клиента → решение → подтверждённый факт → выгода → проверочный вопрос. Выбрать 2–3 аргумента, соответствующие приоритетам.",phrase:"«Вы сказали, что [критерий/боль]. Поэтому предлагаем [решение]. За счёт [факт] вы получаете [конкретная выгода]. Насколько это закрывает вашу задачу?»",result:"Каждый аргумент связан с ранее озвученной потребностью.",control:"Ошибка: выгружать весь каталог, читать презентацию компании и говорить только о свойствах."},
+{id:"5.2",lvl:"Обязательный",sc:"",goal:"Показать выгоду конкретного товара/варианта.",action:"Перевести ключевые параметры в эксплуатационный результат: ресурс, производительность, совместимость, снижение простоя, удобство обслуживания, экономику владения.",phrase:"«[Характеристика] для вас означает [результат в работе]. Например, [сравнение/расчёт], поэтому этот вариант лучше соответствует [критерий клиента]».",result:"Клиент понимает, почему предложен именно этот вариант.",control:"Не использовать непроверенные технические превосходства и абсолютные формулировки «самый лучший»."},
+{id:"5.3",lvl:"Обязательный",sc:"",goal:"Коротко представить компанию новому клиенту.",action:"Дать 20–30 секунд о компании только после того, как задача клиента уже понятна. Формула: кто мы → что закрываем → почему это снижает риск именно в его ситуации.",phrase:"«Коротко о нас: ГК „Альфа-КПД“ с 2008 года занимается поставками товаров для бизнеса из Китая. Мы работаем с техникой, оборудованием, запчастями и нестандартными B2B-задачами. В вашей ситуации наша роль — не просто найти товар, а провести поставку так, чтобы не было сюрпризов по соответствию, документам, срокам и доставке».",result:"Клиент понимает, кто мы и чем полезны в его задаче.",control:"Не читать длинную историю компании. Презентация должна занимать до 30 секунд и быть связана с запросом клиента."},
+{id:"5.4",lvl:"Обязательный",sc:"",goal:"Показать полный цикл работы.",action:"Объяснить, что клиент получает не разрозненные услуги, а единый управляемый процесс: подбор, проверка, закупка, консолидация, таможня, логистика, документы и сопровождение.",phrase:"«Мы закрываем поставку в одном контуре: подбираем и проверяем поставщика, согласуем параметры, организуем выкуп, контроль, таможенное оформление и доставку до места. Для вас это один ответственный по всей цепочке, а не отдельные подрядчики, между которыми потом приходится разбираться самому».",result:"Клиент видит ценность процесса, а не только цену товара.",control:"Не обещать полный цикл там, где по конкретной сделке компания не оказывает отдельную услугу. Уточнять доступный формат заранее."},
+{id:"5.5",lvl:"Расширенный",sc:"",goal:"Усилить доверие фактами о компании.",action:"Использовать подтверждённые факты только в том объёме, который уместен для клиента: опыт с 2008 года, команда, филиалы/представители, офис и склад в КНР, более 4 000 клиентов, работа с поставщиками и брендами.",phrase:"«Мы не просто пересылаем прайс из Китая. У нас есть команда, инфраструктура в Китае и России, опыт поставок для бизнеса с 2008 года и база проверенных поставщиков. Поэтому мы можем не только посчитать цену, но и проверить реальность поставки, комплектацию, документы и маршрут».",result:"У клиента появляется основание доверять компании и продолжать диалог.",control:"Не перегружать цифрами и регалиями. Называть только то, что подтверждено и важно для конкретного клиента."},
+{id:"5.6",lvl:"Обязательный",sc:"",goal:"Связать компанию с конкретной выгодой клиента.",action:"Перевести рассказ о компании в практический результат для клиента: меньше риска, меньше потери времени, понятная ответственность, контроль сроков, корректные документы, снижение риска ошибки в подборе.",phrase:"«Для вас это означает, что мы берём на себя самые рискованные участки: поиск и проверку поставщика, контроль соответствия товара, логистику, таможенные вопросы и документы. В итоге вы получаете не просто китайское предложение, а управляемую поставку под вашу задачу».",result:"Клиент понимает, за что платит и какой риск снимает компания.",control:"Не продавать «надёжность» общими словами. Всегда привязывать её к боли клиента: срок, соответствие, простой, документы, гарантия, доставка."},
+{id:"5.7",lvl:"Развилка",sc:"«почему через вас, а не напрямую»",goal:"Ответить на скрытый вопрос «почему через вас, а не напрямую».",action:"Если клиент сравнивает с самостоятельной закупкой, спокойно показать разницу между «купить дешевле» и «получить рабочий результат без лишних рисков».",phrase:"«Напрямую в Китае иногда можно найти цену ниже. Вопрос в том, кто проверит поставщика, комплектацию, отгрузку, документы, таможню и что делать, если товар не совпадёт с ожиданием. Наша ценность — в том, что мы берём эту ответственность и ведём поставку как проект».",result:"Сформирована разница между ценой товара и стоимостью безопасной поставки.",control:"Не спорить с клиентом и не обесценивать прямую закупку. Спокойно показывать риски и зоны ответственности."},
+{id:"5.8",lvl:"Обязательный",sc:"",goal:"Вернуть разговор от компании к задаче клиента.",action:"После короткой презентации сразу перейти к конкретному предложению или следующему вопросу, чтобы не превращать разговор в монолог.",phrase:"«Теперь вернусь к вашей задаче. С учётом того, что для вас важны [срок/качество/документы/доставка], я бы предложил рассмотреть [вариант/сценарий]. Давайте покажу, почему».",result:"Презентация компании не зависла отдельно, а стала мостиком к решению.",control:"Ошибка: рассказать о компании и не связать это с товаром, расчётом или следующим шагом."},
+{id:"5.9",lvl:"Расширенный",sc:"",goal:"Подкрепить слова доказательствами.",action:"Предложить релевантные кейсы, фото/видео, документы, сравнительную таблицу, график этапов, образец договора, рекомендации клиентов — с соблюдением конфиденциальности.",phrase:"«Чтобы это не звучало как обещание, направлю [кейс/фото контроля/документ/график поставки]. Что из этого будет полезнее для вашего согласования?»",result:"Согласован набор доказательств.",control:"Не пересылать конфиденциальные данные других клиентов без разрешения."},
+{id:"5.10",lvl:"Обязательный",sc:"",goal:"Дать клиенту управляемый выбор.",action:"Предложить 2–3 сопоставимых варианта: быстрее/дороже, оптимальный, экономичный/дольше; оригинал/OEM/аналог; базовая/расширенная комплектация.",phrase:"«Вариант А — [срок/цена/плюс]; вариант Б — [срок/цена/плюс]; вариант В — [срок/цена/плюс]. С учётом вашего приоритета [ ], я рекомендую [ ]. Какой сценарий ближе?»",result:"Клиент выбрал направление или назвал, что нужно изменить.",control:"Не давать искусственный выбор между двумя одинаковыми вариантами."},
+{id:"5.11",lvl:"Обязательный",sc:"",goal:"Проверять реакцию по ходу презентации.",action:"После каждого смыслового блока задать один короткий вопрос и слушать ответ.",phrase:"«Насколько это для вас актуально?» / «Это снимает вопрос по сроку/качеству?» / «Что из сказанного наиболее важно?»",result:"Есть явная обратная связь, а не молчаливое согласие.",control:"Ошибка: двадцатиминутный монолог без вопросов."},
+{id:"5.12",lvl:"Обязательный",sc:"",goal:"Показать ценность следующего шага (КЭВ).",action:"Перечислить, что именно клиент получит после звонка и зачем это ему.",phrase:"«После разговора я направлю: два варианта с итоговой стоимостью, подтверждённые сроки, состав комплектации, условия гарантии и перечень документов. Так вы сможете сравнить предложения на одной базе и согласовать решение внутри».",result:"Клиент понимает ценность материалов и готов к следующему действию.",control:"Не обещать объём материалов, который менеджер не сможет подготовить в срок."}
+]},
+{num:"6",title:"Предзакрытие",items:[
+{id:"6.1",lvl:"Обязательный",sc:"",goal:"Проверить соответствие решения до финального предложения.",action:"Задать вопрос о том, насколько решение подходит в целом.",phrase:"«Я правильно понимаю, что по задаче и комплектации вариант вам подходит?» / «Насколько предложение закрывает ваши основные критерии?»",result:"Получено содержательное «да», «да, но…» или конкретное несоответствие.",control:"Не переходить к счёту, если клиент ещё не подтвердил сам вариант."},
+{id:"6.2",lvl:"Обязательный",sc:"",goal:"Выявить последний барьер.",action:"Спросить, что мешает перейти к следующему шагу, не подталкивая к формальному «я подумаю».",phrase:"«Что осталось неясным или что сейчас мешает двигаться дальше?» / «Что нужно добавить или изменить, чтобы вариант подошёл полностью?»",result:"Назван реальный барьер или подтверждена готовность.",control:"Не спорить с первым ответом и не начинать давить."},
+{id:"6.3",lvl:"Развилка",sc:"выбор следующего этапа",goal:"Выбрать правильный следующий этап.",action:"Если подходит — закрывать на действие. Если «да, но» — отработать конкретное возражение. Если не подходит — вернуться к потребности и скорректировать решение.",phrase:"«Понял. Тогда сначала разберём вопрос по [цена/срок/доверие], и после этого решим по следующему шагу».",result:"Диалог движется по выявленной причине, а не по догадке менеджера.",control:"Ошибка: продолжать презентацию теми же аргументами после явного несоответствия."}
+]},
+{num:"7",title:"Отработка возражений (алгоритм ПУОП)",items:[
+{id:"7.0",lvl:"Правило",sc:"алгоритм ПУОП",goal:"Снять сомнение без спора и сохранить доверие.",action:"Алгоритм ПУОП: Принять право клиента на сомнение → Уточнить истинную причину → Ответить фактами/вариантами → Проверить, снят ли вопрос.",phrase:"«Понимаю, это важный вопрос. Уточните, пожалуйста…» → ответ → «Это снимает сомнение или остаётся ещё что-то?»",result:"Выявлена и обработана реальная причина.",control:"Критические ошибки: спорить, обесценивать, перебивать, давать скидку до диагностики."},
+{id:"7.1",lvl:"Возражение",sc:"цена / «дорого»",goal:"Понять базу сравнения и сохранить ценность.",action:"Уточнить: сравнение с КП, внутренним бюджетом или ожиданием. Сопоставить одинаковую комплектацию, срок, логистику, гарантию и документы. Затем предложить реальный вариант оптимизации.",phrase:"«Понимаю, бюджет важен. Вы сравниваете с конкретным КП или с плановым бюджетом? Давайте сравним на одной базе: комплектация, срок, доставка, гарантия и документы. Что из условий нельзя ухудшать? После этого посмотрим вариант по комплектации, сроку, объёму или подтверждённой спеццене».",result:"Понятна причина «дорого» и согласован путь пересчёта.",control:"Не снижать цену автоматически и не выдумывать согласование скидки."},
+{id:"7.2",lvl:"Возражение",sc:"срок",goal:"Разделить неприемлемый срок и страх срыва.",action:"Уточнить крайний дедлайн и последствия. Предложить только реальные сценарии: наличие, другой завод, частичная отгрузка, ускоренная логистика, аналог, перенос части объёма.",phrase:"«Вам не подходит сама длительность или есть сомнение, что срок выдержим? Какая крайняя дата? Проверю варианты: наличие/аналог/частичная поставка/ускоренная логистика. Какой компромисс допустим — цена, комплектация или партия?»",result:"Выбран реальный сценарий либо признано, что срок не выполним.",control:"Не обещать ускорение до подтверждения закупкой и логистикой."},
+{id:"7.3",lvl:"Возражение",sc:"качество / «Китай»",goal:"Перевести разговор от стереотипа к проверяемым критериям.",action:"Уточнить негативный опыт и критерии качества; предложить завод, спецификацию, материалы, контроль, сертификаты, гарантию, образец или инспекцию.",phrase:"«Понимаю опасение. Был конкретный негативный опыт или сомнение в целом? Что для вас подтверждает качество: завод, материалы, ресурс, документы, гарантия, проверка до отгрузки? Подберём подтверждения именно по этим пунктам».",result:"Согласован набор критериев и доказательств.",control:"Не отвечать «в Китае сейчас всё качественное» и не критиковать неизвестный товар конкурента."},
+{id:"7.4",lvl:"Возражение",sc:"доверие",goal:"Понять, чего не хватает для безопасного решения.",action:"Спросить, сомнение в компании, схеме оплаты, сроках или документах. Предложить проверяемые реквизиты, договор, этапы контроля, кейсы, фото/видео, рекомендации с разрешения.",phrase:"«Абсолютно нормально проверять поставщика. Что именно нужно подтвердить: компанию, оплату, контроль товара, документы или исполнение сроков? Я соберу доказательства по этому пункту».",result:"Есть конкретный перечень подтверждений и срок отправки.",control:"Не давить авторитетом и не раскрывать данные других клиентов без согласия."},
+{id:"7.5",lvl:"Возражение",sc:"у конкурента дешевле",goal:"Провести честное сравнение одинаковых условий.",action:"Сравнить модель, характеристики, комплектацию, логистику, НДС, документы, гарантию, срок и риски. Если действительно дороже — признать и искать обоснованный вариант.",phrase:"«Давайте проверим, что сравниваем одинаковую поставку. Совпадают ли модель, комплектация, доставка до объекта, НДС, документы, гарантия и срок? Если после сравнения мы дороже — честно покажу, за что разница, либо подготовлю другой вариант».",result:"Есть сопоставимая база и решение по корректировке.",control:"Не обесценивать предложение конкурента без данных."},
+{id:"7.6",lvl:"Возражение",sc:"«надо подумать»",goal:"Выявить предмет размышления и не потерять сделку.",action:"Дать право подумать, затем уточнить: техническое соответствие, цена, срок, доверие или внутреннее согласование.",phrase:"«Конечно. Чтобы не отвлекать вас лишними звонками, уточню: что именно нужно обдумать — сам вариант, цену, срок, риски или согласование внутри? Что поможет принять решение?»",result:"Названа причина и согласован следующий контакт.",control:"Ошибка: отвечать «хорошо, думайте» без даты и предмета решения."},
+{id:"7.7",lvl:"Возражение",sc:"нужно согласовать",goal:"Помочь контакту продать решение внутри компании.",action:"Уточнить участников и критерии; подготовить короткое резюме, сравнение или назначить общий звонок.",phrase:"«Что важно руководителю/инженеру/финансам? Я подготовлю одностраничное резюме по цене, сроку, рискам и выгоде либо подключусь на совместный звонок. Как будет удобнее?»",result:"Согласованы материалы, адресаты и дата внутреннего решения.",control:"Не пытаться обойти контакт и самостоятельно выходить на ЛПР без согласования."},
+{id:"7.8",lvl:"Возражение",sc:"нет бюджета",goal:"Отличить отсутствие денег от несогласованного бюджета.",action:"Уточнить, покупка отменяется или переносится; допустимы ли другой вариант, этапность, меньшая партия, лизинг/кредит — только если доступны.",phrase:"«Правильно понимаю: закупка в целом нужна, но бюджет сейчас не утверждён/недостаточен? Когда пересматривается бюджет? Рассмотреть более экономичную комплектацию, этапность или меньшую партию?»",result:"Есть реальный сценарий или дата возврата.",control:"Не предлагать финансовые инструменты, которых компания не предоставляет."},
+{id:"7.9",lvl:"Возражение",sc:"сейчас неактуально",goal:"Сохранить полезный будущий контакт.",action:"Уточнить причину, цикл закупок и дату вероятной потребности; предложить релевантный материал без спама.",phrase:"«Понял. Это вопрос срока, отсутствия потребности или уже выбрали поставщика? Когда обычно формируется следующая закупка? Я могу направить короткий перечень возможностей и вернуться к вам [дата]».",result:"В CRM стоит обоснованная дата и причина следующего касания.",control:"Не ставить еженедельные звонки клиенту без договорённости."},
+{id:"7.10",lvl:"Возражение",sc:"«просто пришлите информацию»",goal:"Сделать отправку частью процесса принятия решения.",action:"Уточнить, какие материалы нужны, кто смотрит и когда обсуждать.",phrase:"«Конечно. Что именно нужно для решения: цена, характеристики, документы, кейсы или сравнение? Кто будет смотреть и когда удобно обсудить выводы?»",result:"Отправка имеет цель, адресата и дату обратной связи.",control:"Не отправлять десять файлов без пояснения и последующего шага."},
+{id:"7.11",lvl:"Правило",sc:"срочность и спецусловия",goal:"Использовать основания для решения сейчас этично.",action:"Говорить только об объективных ограничениях: срок действия подтверждённой цены, реальный остаток, производственный слот, дедлайн тендера, сезон, объединение логистики. Фиксировать условия письменно.",phrase:"«Подтверждённая цена действует до [дата] из-за [объективная причина]. Если решение позже — пересчитаем по фактическим условиям. Готовы зафиксировать текущий вариант?»",result:"Клиент понимает реальную причину срока решения.",control:"Запрещено создавать искусственный дефицит, выдумывать рост курса, скидку или «личный бонус»."}
+]},
+{num:"8",title:"Закрытие и следующий шаг",items:[
+{id:"8.1",lvl:"Закрытие",sc:"на заказ",goal:"Перевести готовность в оформление.",action:"Предложить конкретное действие и уточнить реквизиты, подписанта, порядок оплаты и срок.",phrase:"«Вариант вам подходит. Переходим к оформлению: сначала направить счёт или договор?» / «На какие реквизиты оформить и кто будет подписывать?» / «Когда сможете подтвердить заказ/оплату?»",result:"Выставляется счёт/договор, определены ответственные и сроки.",control:"Не задавать расплывчатое «Ну что, будете брать?»"},
+{id:"8.2",lvl:"Закрытие",sc:"на КП / расчёт",goal:"Зафиксировать взаимные обязательства до следующего контакта.",action:"Назвать, что и когда подготовит менеджер, что и когда пришлёт клиент, когда будет разбор предложения.",phrase:"«Я до завтра 12:00 направляю два варианта с итоговой стоимостью и сроками. От вас сегодня ждём фото шильдика и реквизиты. Завтра в 15:00 созваниваемся и выбираем вариант. Договорились?»",result:"Есть SMART-договорённость: кто, что, когда и зачем.",control:"Ошибка: «Я пришлю КП, потом как-нибудь созвонимся»."},
+{id:"8.3",lvl:"Закрытие",sc:"на технический этап",goal:"Продвинуть сложную сделку к подтверждённому ТЗ.",action:"Назначить техническую встречу, запрос документов, осмотр, расчёт логистики или проверку завода.",phrase:"«Следующий шаг — 20-минутный звонок с вашим инженером и нашим техническим специалистом. На нём подтвердим [параметры]. Предлагаю [дата/время]».",result:"Назначено событие и понятен его результат.",control:"Не считать назначение встречи успехом, если нет повестки и нужных участников."},
+{id:"8.4",lvl:"Закрытие",sc:"на согласование / тендер",goal:"Поддержать процесс клиента и установить контрольную точку.",action:"Уточнить дедлайн, формат, участников и основание для следующего контакта.",phrase:"«До [дата] направляю комплект в формате [ ]. Вы обсуждаете его [дата]. Я связываюсь с вами [дата/время], чтобы получить решение и при необходимости скорректировать».",result:"Зафиксированы документы, дедлайн и дата решения.",control:"Не оставлять сделку в статусе «на согласовании» без даты."},
+{id:"8.5",lvl:"Обязательный",sc:"",goal:"Сформулировать следующий шаг одинаково понятно обеим сторонам.",action:"Использовать формулу: менеджер делает X до времени A; клиент делает Y до времени B; совместный контакт — C; ожидаемый результат — D.",phrase:"«Фиксирую: я [действие] до [дата/время], вы [действие] до [дата/время], затем [дата/время] принимаем решение по [результат]. Всё верно?»",result:"Следующий шаг озвучен клиенту и поставлен в CRM.",control:"Если нет даты и результата — следующего шага фактически нет."},
+{id:"8.6",lvl:"Обязательный",sc:"",goal:"Письменно закрепить договорённость.",action:"Сразу после разговора отправить короткое резюме в согласованный канал.",phrase:"«[Имя], фиксирую договорённости: задача — …; от нас до … — …; от вас до … — …; следующий созвон … в …».",result:"У клиента и менеджера одинаковое понимание.",control:"Не отправлять только вложение без пояснения и даты обратной связи."}
+]},
+{num:"9",title:"Дополнительные продажи и развитие клиента",items:[
+{id:"9.1",lvl:"Дополнительный",sc:"после основной задачи",goal:"Предложить логично связанные товары.",action:"Отталкиваться от эксплуатации и уже согласованной поставки: ЗИП, расходники, комплект фильтров, навесное, упаковка, монтаж, запасные узлы.",phrase:"«Чтобы не делать отдельную доставку, обычно вместе с [основной товар] проверяют потребность в [сопутствующие позиции]. Включить в расчёт как отдельную опцию?»",result:"Клиент согласился на расчёт либо отказался без давления.",control:"Не предлагать случайный товар, не связанный с задачей клиента."},
+{id:"9.2",lvl:"Стратегический",sc:"",goal:"Перевести разовую заявку в системную работу.",action:"Предложить анализ парка, план закупок, рамочный перечень, склад критичных позиций или регулярный обзор цен/сроков.",phrase:"«После текущей поставки можем отдельно разобрать ваш парк и годовой план, чтобы заранее закрыть критичный ЗИП и объединять закупки. Назначим рабочую встречу?»",result:"Появилась отдельная задача по развитию аккаунта.",control:"Не смешивать развитие клиента с закрытием срочной основной заявки."}
+]},
+{num:"10",title:"Фиксация в CRM",items:[
+{id:"10.1",lvl:"Обязательный",sc:"",goal:"Сохранить информацию так, чтобы любой коллега продолжил работу.",action:"Заполнить: компания и отрасль; контакт, роль и ЛПР; товар/ТЗ/артикулы; количество; задача и боль; критерии; бюджет и формат цены; закупка/оплата; город и доставка; сроки; конкуренты/текущий поставщик; риски; необходимые документы.",phrase:"CRM содержит факты, а не комментарий «пообщались, ждёт КП».",result:"Карточка заполнена и понятна другому сотруднику.",control:"Критическая ошибка: хранить важные договорённости только в личном мессенджере."},
+{id:"10.2",lvl:"Обязательный",sc:"",goal:"Обеспечить управляемость сделки.",action:"Поставить дело с точными датой, временем, ответственным и ожидаемым результатом; прикрепить материалы и переписку; обновить стадию.",phrase:"Название дела: «Получить фото шильдика до 08.08 12:00» / «Разбор КП с клиентом 09.08 15:00 — выбрать вариант».",result:"Нет активной сделки без следующего дела.",control:"Не ставить бессодержательные задачи «позвонить клиенту»."},
+{id:"10.3",lvl:"Обязательный",sc:"",goal:"Корректно квалифицировать исход.",action:"Если сделка не продолжается — указать реальную причину: нет потребности, не подходит срок/цена/характеристики, уже купили, нет контакта, тендер закрыт, не наш профиль. Зафиксировать условия возврата.",phrase:"Причина отказа конкретна и пригодна для аналитики.",result:"Есть понятный статус и, при необходимости, дата возврата.",control:"Не выбирать «другое» и не закрывать лид из-за одного недозвона."},
+{id:"10.4",lvl:"Правило",sc:"",goal:"Оценивать хороший разговор по продвижению сделки, а не по длине.",action:"Результат звонка — заказ либо квалифицированный следующий шаг с взаимными обязательствами. Если клиент не подходит, качественная дисквалификация тоже является результатом.",phrase:"Контрольный вопрос менеджера: «Что изменилось в сделке после этого контакта?»",result:"Сделка продвинулась, остановлена обоснованно или запланирован возврат.",control:"Долгий разговор без новых данных и следующего действия — не результат."}
+]}
+];
+
+/* ================= ДАННЫЕ: БЫСТРЫЕ ОТВЕТЫ ================= */
+const QUICK=[
+{t:"Клиент сразу спрашивает цену",p:"«Сориентирую. Для корректной цифры уточню модель/параметры, количество и город доставки».",why:"Не назвать случайную цену.",ctl:"Назвать срок точного расчёта."},
+{t:"Клиент просит только КП",p:"«Отправлю. Чтобы КП можно было сравнить, уточню задачу, комплектацию, срок и адрес поставки».",why:"Сделать КП релевантным.",ctl:"Согласовать дату разбора КП."},
+{t:"Клиент занят",p:"«Что удобнее: сегодня после 16:00 или завтра до 11:00?»",why:"Не потерять контакт.",ctl:"Поставить точное дело в CRM."},
+{t:"«Дорого»",p:"«С чем сравниваете: КП или бюджетом? Сопоставим комплектацию, срок, доставку, гарантию и документы».",why:"Найти истинную причину.",ctl:"Не давать скидку до сравнения."},
+{t:"«Надо подумать»",p:"«Что именно нужно обдумать: вариант, цену, срок, риски или согласование?»",why:"Выявить предмет решения.",ctl:"Зафиксировать дату ответа."},
+{t:"Нужно согласование",p:"«Что важно руководителю/инженеру/финансам? Подготовлю резюме или подключусь на общий звонок».",why:"Помочь контакту внутри компании.",ctl:"Адресат, материалы, дата решения."},
+{t:"Следующий шаг",p:"«Я X до A, вы Y до B, в C обсуждаем и принимаем решение D».",why:"Сделать сделку управляемой.",ctl:"Без даты следующего шага нет."}
+];
+
+/* ================= ДАННЫЕ: ШАБЛОНЫ ДЛЯ ЧАТОВ (БЕЗ «КП ЗАЩИЩЕНО») ================= */
+const TPL=[
+{stage:"1. Отправка КП",note:"При отправке КП МОП пишет сопроводительный текст — на свой выбор из вариантов ниже, в зависимости от ситуации.",items:[
+["Стандартный при отправке","Добрый день! Отправил вам КП. Пожалуйста, ознакомьтесь и дайте знать, если будут вопросы. Готов обсудить детали!"],
+["Короткий и вежливый / гибкие условия","Добрый день! Вот наше предложение. Если что-то не подходит — можем гибко изменить условия. Дайте знать, что думаете!"],
+["Следующий шаг + дедлайн","Приветствую! КП уже у вас. Прошу дать обратную связь до [дата], чтобы мы могли оперативно внести правки и взять в работу. Спасибо!"],
+["Вопрос на вовлечение","Добрый день! Отправил предложение. Как вам условия? Все ли устраивает или нужно что-то доработать?"],
+["Для отправки на почту","Уважаемый [Имя], КП направлено. Прошу подтвердить получение и обозначить сроки рассмотрения. Буду признателен за обратную связь."],
+["С акцентом на выгоду","Здравствуйте! В КП я выделил основные выгоды для вас. Если нужно что-то уточнить или адаптировать под ваши задачи — просто скажите!"],
+["Срочное предложение (по акции)","Спешу напомнить: в КП есть специальные условия до [дата]. Дайте знать, если хотите успеть — начнём оформлять! (скидывайте карточку — выставлю счёт)"],
+["Повторное: для сомневающихся","Здравствуйте! Вы ознакомились с предложением? Если есть сомнения — можем созвониться, и я отвечу на вопросы. Сейчас удобно?"],
+["Повторное: напоминание","Напоминаю о себе — КП уже у вас. Не получил обратной связи, возможно, остались вопросы? Готов обсудить сейчас."],
+["Дружелюбный вариант","Добрый день! Вот наше предложение :) Если что-то не подходит — можем гибко изменить условия. Дайте знать, что думаете!"]
+]},
+{stage:"2. Согласование КП",note:"Сделка находится на этом этапе, только если клиент уточнил: КП на согласовании у ЛПР (ген. директор, руководитель, начальник отдела и т.д.), на согласовании в лизинге либо необходимо внести изменения в КП. Необходим ЗВОНОК — начните с фразы ниже; если нет ответа — отправьте сообщение.",items:[
+["Через отсылку к конкурентам","Часто на этом этапе клиенты сравнивают нас с другими поставщиками. Интересно, какие критерии важны для вашего ЛПР? Помогу подготовить аргументы."],
+["Если затягивается рассмотрение","Понимаем, что процесс требует времени, но не могли бы вы уточнить, какие этапы остаются? Хотим быть в курсе."],
+["Вежливый и ненавязчивый","[Имя], добрый день! Подскажите, пожалуйста, есть ли уже решение по нашему предложению? Нужно ли что-то доработать с моей стороны?"],
+["С предложением помощи","Как продвигается согласование? Если ЛПР нужны дополнительные данные — готов оперативно помочь!"],
+["С намёком на сроки","Напомните, пожалуйста, когда ожидается финальное решение? Хочу убедиться, что мы успеем всё подготовить."],
+["Через призму выгоды для клиента","[Имя], вы упомянули, что решение за [ЛПР]. Как думаете, что для них будет ключевым при выборе? Можем акцентировать это в предложении."],
+["Для «зависших» сделок","Понимаю, что процесс согласования может затягиваться. Есть ли возможность дать номер телефона ЛПР, чтобы я напрямую с ним согласовал?"],
+["По срокам","Если решение затягивается, мы можем не успеть поставить в нужные для вас сроки?"],
+["Для лизинга: предложение помощи","Если у вас есть вопросы по нашим документам — готовы оперативно предоставить недостающую информацию."],
+["Для лизинга: вопрос о недостающих документах","Проверяли ли статус нашей заявки? Возможно, требуется что-то донести или исправить?"],
+["Для лизинга: для ускорения процесса","Есть ли возможность ускорить рассмотрение? Для клиента очень важны сроки."]
+]},
+{stage:"3. Счёт выставлен",note:"Необходим ЗВОНОК — начните с фразы ниже; если нет ответа — отправьте сообщение.",items:[
+["Ссылка на договорённость","Согласно договору, оплата должна была поступить до [дата]. Подскажите, пожалуйста, когда ожидать оплату?"],
+["Вежливое напоминание","Добрый день! Напоминаем, что вам выставлен счёт №[номер] от [дата]. Просим подтвердить, когда ожидать поступления средств?"],
+["Мягкий контроль","Напоминаем о необходимости оплаты счёта №[номер]. Просим уточнить сроки, чтобы закрыть вопрос."],
+["Для постоянных клиентов","[Имя], вы обычно платите вовремя, а этот счёт ещё не оплачен — что-то изменилось?"],
+["Если отвечает «нет денег»","Если сейчас сложно оплатить полную сумму, можем обсудить рассрочку. Как вам удобнее?"]
+]}
+];
+
+/* ================= ДАННЫЕ: СТОП-ЛИСТ ================= */
+const STOP=[
+{bad:"Я не знаю…",why:"Стандартная реакция клиента: «Так, а чего вы там сидите тогда?». Всегда держите 2–3 альтернативные фразы.",good:"Вам удобно подождать минуту, я уточню вопрос?"},
+{bad:"Не могу ничего обещать…",why:"Звучит обезнадёживающе: будто вы не намерены или не заинтересованы помочь клиенту. Нужно перефразировать.",good:"Я сделаю всё возможное, чтобы решить ваш вопрос."},
+{bad:"Мы разберёмся с этим…",why:"Звучит неопределённо, у клиента впечатление, что от него хотят отделаться. Озвучьте, что конкретно сделаете, и обозначьте сроки.",good:"Мне нужно детальнее разобраться с некоторыми моментами. Я перезвоню вам сегодня в два."},
+{bad:"Вы должны…",why:"Звучит резко и загоняет абонента в угол. Слово «должен» заменяйте на «необходимо» и облагайте мысль в более мягкую форму.",good:"Чтобы я максимально оперативно разрешил ваш вопрос, вы можете со своей стороны…"},
+{bad:"Вы не правы…",why:"Забудьте эту фразу: есть много способов показать, что на ситуацию можно взглянуть и с другой стороны.",good:"Да, я с вами согласен, есть такое мнение, и при этом…"},
+{bad:"Вы уверены?",why:"Клиенту сложно признать неуверенность вслух — не заставляйте его. Помогите вспомнить нужную информацию.",good:"Давайте подытожим, чтобы я убедился, что мы обо всём позаботились."},
+{bad:"Сожалею, но нет…",why:"Нет ничего хуже слова «нет» — клиент мгновенно «выключается». Используйте синонимы и предлагайте другие варианты решения.",good:"Такие услуги мы не предоставляем, но можем предложить следующее…"},
+{bad:"Ничем не могу помочь…",why:"Помочь можно всегда — как минимум выслушать и понять клиента.",good:"Я понимаю ваше расстройство. Да, действительно, неприятно. Чем я могу вам помочь?"},
+{bad:"Позвольте мне вас поправить / ещё раз объяснить…",why:"У клиента впечатление, что его считают недостаточно умным, — это вызывает негатив. Возьмите вину на себя, клиент это оценит.",good:"Мне следовало пояснить вам этот вопрос, моё упущение."},
+{bad:"Кажется, вы меня не поняли…",why:"Вы будто перекладываете вину на клиента и указываете на его несостоятельность. Предположите, что вы сами неверно поняли информацию.",good:"Кажется, я не до конца понял ваш запрос, давайте уточним…"},
+{bad:"Данный вопрос — не в моей компетенции…",why:"Если это действительно так — переводите звонок на того, кто владеет ситуацией, либо обещайте выяснить к определённому сроку.",good:"Я не могу ответить на ваш вопрос, но руководитель будет рад вам помочь. Позвольте мне соединить вас? / Для решения этого вопроса мне необходимо связаться с … Я могу перезвонить вам через час?"},
+{bad:"Простите, простите, простите…",why:"Если вы совершили ошибку, не злоупотребляйте извинениями — лучше предложите конкретные пути решения.",good:"Мы приносим извинения за сложившуюся ситуацию. Не волнуйтесь, мы всё поправим."},
+{bad:"У нас нет информации о вашем запросе…",why:"Это катастрофа: у клиента бессилие вперемешку с злостью. Дайте понять, что вы его не бросаете.",good:"Возможно, вы указали другой телефон/мейл при отправке заявки. Пока я ищу ваш запрос, расскажите, пожалуйста, чем я могу вам помочь."},
+{bad:"Я же говорю…",why:"Если клиент повторяет вопрос или претензию снова и снова — его не устраивает полученный ответ. Перефразируйте ответ так, чтобы он удовлетворил клиента, либо разделите его негодование и убедите, что проблема будет решена.",good:""}
+];
+
+/* ================= ДАННЫЕ: ЗАПРОС КОНТАКТОВ ================= */
+const CONTACTS={
+chat:[
+{num:1,title:"Клиент сразу пишет: «Скиньте КП»",action:"Не отправляем КП в первом же сообщении (на Авито/Дроме — тем более), а предлагаем персонализированный расчёт через звонок или мессенджер.",phrase:"«Имя, добрый день! КП я подготовлю именно под ваши задачи — цена и комплектация зависят от региона, доставки и дополнительных опций. Чтобы ничего не упустить, лучше созвониться — займёт 2 минуты. Напишите ваш номер — я перезвоню в удобное время».",variant:"Если клиент настаивает на «просто скиньте»: «Хорошо, я могу отправить общий прайс-лист, но он без учёта ваших условий — там цены могут отличаться»."},
+{num:2,title:"Клиент сразу уточняет характеристики или другую информацию (технический вопрос)",action:"Даём краткий ответ по сути (например, «да, такая модель есть, мощность 150 л.с.»), но сразу переводим в диалог для деталей.",phrase:"«Имя, по характеристикам: [краткий ответ]. Но для полной картины лучше поговорить — я расскажу все нюансы и покажу альтернативы. Напишите свой номер, я перезвоню вам».",variant:""},
+{num:3,title:"Клиент уточняет: «В наличии или нет?»",action:"Проверяем наличие (если есть — отвечаем), но добавляем, что актуальность меняется, поэтому лучше сразу зарезервировать или уточнить детали.",phrase:"«Имя, на данный момент [есть / нет в наличии]. Если нужно — я могу проверить под заказ или предложить аналог. Чтобы оперативно решить, удобнее созвониться: напишите номер — я перезвоню и расскажу все варианты и сроки».",variant:""},
+{num:4,title:"Клиент просит телефон менеджера (или «дайте ваш контакт»)",action:"На Авито/Дроме это запрещено, поэтому мягко перенаправляем — просим его оставить свой номер.",phrase:"«Имя, мы не передаём контакты в переписке на этой площадке, но я готов сам вам перезвонить — так будет быстрее и надёжнее. Напишите свой номер, и я свяжусь с вами в удобное вам время».",variant:"Если клиент не хочет давать номер: отправить номер телефона отдела с просьбой, чтобы клиент попросил соединить с конкретным менеджером, т.е. оставить своё имя и фамилию."},
+{num:5,title:"Мы видим, что клиент просматривал объявление, но ничего не написал",action:"Проявляем инициативу — отправляем вежливое сообщение с предложением помощи (не навязчиво).",phrase:"«Имя, здравствуйте! Я заметил, что вы интересуетесь [модель/товар]. Если есть вопросы — я готов ответить. Могу быстро проверить наличие, цену и доставку. Напишите, если нужна помощь — я перезвоню или напишу в мессенджере».",variant:""},
+{num:6,title:"Клиент не реагирует на первый запрос контакта (после 1-го сообщения)",action:"На следующий день отправляем второе сообщение, меняя подход — предлагаем альтернативу (например, ответить прямо в чате без звонка, но с ограниченной информацией).",phrase:"«Имя, если звонить неудобно, давайте перейдём в мессенджер (Telegram / WhatsApp / МАКС) — там удобно обмениваться файлами. На Авито/Дром файлы не прикрепить. Просто оставьте свой номер, я напишу вам в удобный мессенджер».",variant:""},
+{num:7,title:"Клиент не реагирует на 2 предыдущих запроса — финальное (3-е) касание",action:"Закрываем диалог, но оставляем возможность возобновить. Фиксируем в CRM как «не готов к контакту» (по регламенту — через 3 дня молчания).",phrase:"«Имя, мы не получили от вас обратной связи. Если вопрос ещё актуален — готов ответить на ваши вопросы».",variant:"Если и после этого молчит — закрываем лид. В CRM ставим статус «Не готов к контакту» или «Не дозвонились»."}
+],
+email:[
+{num:1,title:"Если в письме указан телефон",action:"Обязательно звоним в течение рабочего дня. Цель — квалифицировать клиента: уточнить компанию, парк техники, потребности, регион, сроки. После звонка отправляем краткое письмо-подтверждение с резюме разговора и, при необходимости, КП.",phrase:"",variant:""},
+{num:2,title:"Если контактов в письме нет (только адрес эл. почты)",action:"Отвечаем обратным письмом в тот же день: благодарим за запрос; говорим, что для точного расчёта нужно уточнить несколько деталей; просим прислать номер телефона для звонка (или удобный мессенджер); НЕ отправляем КП, пока не уточнили детали.",phrase:"«Добрый день! Спасибо за ваш запрос. Чтобы подготовить для вас максимально точное коммерческое предложение, мне нужно уточнить пару моментов. Напишите, пожалуйста, ваш номер телефона — я позвоню в удобное для вас время. Если вам удобнее в мессенджере — укажите, куда вам лучше написать».",variant:""},
+{num:3,title:"Реакции нет (клиент не отвечает на письмо с просьбой о контактах)",action:"Развилка в зависимости от того, можно ли рассчитать КП без уточнений. Если после третьего письма прошло 3 рабочих дня, а клиент молчит — закрываем лид в CRM (Битрикс) со статусом «Не готов к контакту» или «Не дозвонились».",phrase:"",variant:"Вариант А. КП можно рассчитать (даже без дополнительных данных — например, по стандартным условиям):\n\n«Добрый день! Мы не получили от вас обратной связи, но, чтобы не оставить ваш запрос без внимания, подготовили для вас примерное коммерческое предложение (во вложении). Оно рассчитано по базовым условиям (без учёта ваших индивидуальных требований). Если вас интересует более точный расчёт — сообщите нам свой номер, и мы скорректируем КП под ваши задачи».\n\nВариант Б. КП рассчитать невозможно (требуются уточнения):\n\n«Добрый день! Мы не получили от вас обратной связи, поэтому, к сожалению, не можем сформировать коммерческое предложение — для точного расчёта нам не хватает некоторой информации. Если вы всё же заинтересованы — просто пришлите свой номер, и мы созвонимся для уточнения информации или можем продолжить в удобном вам мессенджере»."}
+]
+};
+
+/* ================= ДАННЫЕ: ШПАРГАЛКА ================= */
+const CHEAT=[
+{t:"Подготовка",d:"Открыть CRM: источник, товар, история, компания. Определить цель звонка.",p:"",r:"Понятен контекст и желаемый результат."},
+{t:"Контакт",d:"Назвать клиента, себя, компанию, повод; проверить удобство.",p:"«Добрый день, [Имя]. [Менеджер], „Альфа-КПД“. Получили ваш запрос по [товар]. Удобно 5–7 минут?»",r:"Имя, роль, удобство разговора."},
+{t:"Программирование",d:"Получить согласие на структуру разговора.",p:"«Задам несколько вопросов, затем предложу варианты и согласуем следующий шаг. Хорошо?»",r:"Есть согласие на структуру."},
+{t:"Компания и роль",d:"Уточнить компанию, объект и карту принятия решения.",p:"«Как называется компания? Для какого объекта? Кто участвует в подборе и согласовании?»",r:"Компания, отрасль, контакт, ЛПР."},
+{t:"Задача и триггер",d:"Понять реальную задачу и причину обращения сейчас.",p:"«Что нужно решить? Почему начали поиск сейчас: поломка, план, расширение, проект?»",r:"Задача, причина, срочность."},
+{t:"Технические данные",d:"Получить спецификацию или список недостающих данных.",p:"«Есть модель, артикул, ТЗ, фото, шильдик или чертёж? Какой результат должно обеспечить решение?»",r:"Спецификация или список недостающих данных."},
+{t:"Объём и требования",d:"Количество, комплектация, качество, документы.",p:"«Количество? Комплектация? Оригинал/OEM/аналог? Какие документы обязательны?»",r:"Количество, комплектация, качество, РД."},
+{t:"Логистика и срок",d:"Адрес, формат доставки, желаемый и крайний сроки.",p:"«Куда доставить? К какой дате должно быть на объекте? Какой крайний срок?»",r:"Город/объект, доставка, дедлайн."},
+{t:"Бюджет и закупка",d:"Бюджет, состав цены, схема закупки и оплаты.",p:"«Есть диапазон? Цена с НДС и доставкой? Прямая закупка, тендер, лизинг? Когда решение?»",r:"Бюджет, формат цены, закупка, дата решения."},
+{t:"Критерии и боль",d:"Приоритеты выбора, проблема, последствия.",p:"«Какие три критерия решающие? Что сейчас не устраивает? Чем грозит задержка?»",r:"Приоритеты, боль, последствия."},
+{t:"Опыт и альтернативы",d:"Прошлый опыт, текущий поставщик, поле сравнения, риски.",p:"«Как решали раньше? С кем работаете? Какие варианты сравниваете? Что беспокоит?»",r:"Поставщик, конкуренты, риски."},
+{t:"Резюме",d:"Собрать вводные и получить подтверждение клиента.",p:"«Итак, вам нужно… до… в…; важнее всего…; решение согласуют… Всё верно?»",r:"Клиент подтвердил вводные."},
+{t:"Презентация",d:"Потребность → решение → факт → выгода → вопрос. Для нового клиента: 20–30 сек о компании → полный цикл поставки → чем это снижает его риск.",p:"«Вы сказали, что [критерий/боль], поэтому предлагаем [решение] — за счёт [факт] вы получаете [выгода]. Насколько это закрывает задачу?»",r:"2–3 аргумента под клиента + короткая презентация компании без монолога."},
+{t:"Предзакрытие и возражения",d:"Проверить соответствие и выявить последний барьер. ПУОП: принять → уточнить → ответить → проверить.",p:"«Что осталось неясным или мешает двигаться дальше?»",r:"Назван и обработан реальный барьер."},
+{t:"Закрытие и CRM",d:"Согласовать SMART-шаг, зафиксировать в CRM, отправить резюме.",p:"«Я делаю X до A, вы Y до B, созваниваемся C и принимаем решение D. Договорились?»",r:"Следующее дело с датой/временем, резюме отправлено."}
+];
+
+/* ================= ДАННЫЕ: ОЦЕНКА ================= */
+const CRITERIA=[
+{n:1,block:"Подготовка",text:"Менеджер изучил CRM, источник, товар и историю; сформулировал цель звонка.",w:4},
+{n:2,block:"Контакт",text:"Начало персонализировано; понятны причина звонка, имя/роль клиента и удобство разговора.",w:5},
+{n:3,block:"Программирование",text:"Менеджер объяснил структуру и получил согласие на вопросы.",w:4},
+{n:4,block:"Квалификация",text:"Уточнены компания, отрасль, роль контакта, ЛПР и участники согласования.",w:8},
+{n:5,block:"Техническая задача",text:"Выявлены задача, товар/ТЗ/артикулы, параметры, количество, комплектация и документы.",w:10},
+{n:6,block:"Срок и логистика",text:"Зафиксированы адрес/объект, формат доставки, желаемый и крайний сроки.",w:6},
+{n:7,block:"Бюджет и закупка",text:"Понятны бюджет/диапазон, состав цены, НДС, схема закупки и оплаты.",w:7},
+{n:8,block:"Процесс решения",text:"Выяснены этапы согласования, критерии, дата решения и нужный формат КП.",w:7},
+{n:9,block:"Потребность и риски",text:"Раскрыты приоритеты, боль, последствия, опыт, альтернативы и опасения.",w:8},
+{n:10,block:"Резюмирование",text:"Менеджер собрал вводные и получил подтверждение клиента.",w:5},
+{n:11,block:"Презентация",text:"Аргументы связаны с потребностью; свойства переведены в выгоды; нет информационного монолога.",w:10},
+{n:12,block:"Доказательства и выбор",text:"Использованы подтверждённые факты/кейсы; предложены сопоставимые варианты.",w:5},
+{n:13,block:"Предзакрытие",text:"Проверена реакция и выявлен последний барьер до закрытия.",w:4},
+{n:14,block:"Возражения",text:"Менеджер принял сомнение, уточнил причину, ответил фактами и проверил результат.",w:6},
+{n:15,block:"Закрытие",text:"Согласован SMART-следующий шаг: кто, что, когда, общий контакт и ожидаемый результат.",w:7},
+{n:16,block:"CRM и follow-up",text:"Информация внесена в CRM, поставлено содержательное дело, клиенту отправлено резюме.",w:4}
+];
+const CRITICALS=[
+"Обещаны неподтверждённые цена, срок, наличие, скидка, гарантия или документы.",
+"Менеджер презентовал решение до понимания задачи и параметров.",
+"Менеджер спорил, давил, вводил в заблуждение или создавал искусственную срочность.",
+"Разговор завершён без конкретного следующего шага с датой и временем.",
+"Ключевые договорённости не внесены в CRM."
+];
+
+/* ================= РЕНДЕР ================= */
+const BADGE={"Обязательный":"b-req","Расширенный":"b-ext","Стратегический":"b-str","Правило":"b-rule","Вариант":"b-var","Развилка":"b-br","Модуль":"b-mod","Возражение":"b-obj","Закрытие":"b-close","Дополнительный":"b-add"};
+const FKEY={"Обязательный":"req","Расширенный":"ext","Стратегический":"str","Правило":"rule","Вариант":"var","Развилка":"var","Модуль":"var","Возражение":"obj","Закрытие":"close","Дополнительный":"close"};
+const SHORT={"0":"Подготовка","1":"Контакт","2":"Программирование","3":"Квалификация","4":"Резюме","5":"Презентация","6":"Предзакрытие","7":"Возражения","8":"Закрытие","9":"Развитие","10":"CRM"};
+
+function renderStageNav(){
+  document.getElementById('stagenav').innerHTML = STAGES.map(s=>
+    `<button class="stn" onclick="goStage('${s.num}')" title="${s.title}">${s.num}. ${SHORT[s.num]}</button>`
+  ).join('');
+}
+function goStage(num){
+  let el=document.getElementById('stage-'+num);
+  if(el && el.style.display==='none'){
+    document.getElementById('search').value=''; query=''; setFilter('all');
+    el=document.getElementById('stage-'+num);
+  }
+  if(!el) return;
+  el.classList.add('open');
+  el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function renderStages(){
+  document.getElementById('stages').innerHTML = STAGES.map((s,i)=>`
+  <div class="stage${i===0?' open':''}" id="stage-${s.num}">
+    <button class="stage-head" onclick="toggleBox(this)">
+      <span class="stage-num">${s.num}</span>
+      <span class="stage-title">${s.title}</span>
+      <span class="stage-count">${s.items.length} пункт(ов)</span>
+      <span class="chev">▾</span>
+    </button>
+    <div class="stage-body">
+      ${s.items.map(it=>{
+        const search=(it.id+' '+it.lvl+' '+(it.sc||'')+' '+it.goal+' '+it.action+' '+it.phrase+' '+it.result+' '+it.control).toLowerCase();
+        return `
+      <div class="item" data-key="${FKEY[it.lvl]}" data-search="${search.replace(/"/g,'')}">
+        <button class="item-head" onclick="toggleBox(this)">
+          <span class="item-num">${it.id}</span>
+          <span class="badge ${BADGE[it.lvl]}">${it.lvl}</span>
+          ${it.sc?`<span class="scenario">${it.sc}</span>`:''}
+          <span class="item-goal">${it.goal}</span>
+          <span class="chev">▾</span>
+        </button>
+        <div class="item-body">
+          <div class="grid2">
+            <div class="block b-action"><h5>Что делает менеджер</h5><p>${it.action}</p></div>
+            <div class="block b-result"><h5>Результат этапа</h5><p>${it.result}</p></div>
+          </div>
+          <div class="block b-phrase"><h5>Готовые формулировки <button class="copy" onclick="copyPhrase(this)">Копировать</button></h5><p class="phrase-text">${it.phrase}</p></div>
+          <div class="block b-ctrl"><h5>Контроль качества</h5><p>${it.control}</p></div>
+        </div>
+      </div>`;}).join('')}
+    </div>
+  </div>`).join('');
+}
+function renderQuick(){
+  document.getElementById('quick').innerHTML = QUICK.map(q=>`
+  <div class="card quick">
+    <button class="q-head" onclick="toggleBox(this)"><span class="q-icon">!</span><span>${q.t}</span><span class="chev" style="margin-left:auto">▾</span></button>
+    <div class="q-body">
+      <div class="block b-phrase"><h5>Что сказать <button class="copy" onclick="copyPhrase(this)">Копировать</button></h5><p class="phrase-text">${q.p}</p></div>
+      <div class="q-why"><b>Зачем</b>${q.why}</div>
+      <div class="block b-ctrl"><h5>Контроль</h5><p>${q.ctl}</p></div>
+    </div>
+  </div>`).join('');
+}
+function renderTpl(){
+  document.getElementById('tpl').innerHTML = TPL.map(g=>`
+  <div class="card" style="margin-bottom:14px">
+    <div class="tpl-stage">${g.stage}</div>
+    <div class="tpl-note">${g.note}</div>
+    ${g.points?`<div class="tpl-points">${g.points}</div>`:''}
+    <div class="grid2">
+      ${g.items.map(it=>`
+      <div class="block b-phrase">
+        <h5>${it[0]} <button class="copy" onclick="copyPhrase(this)">Копировать</button></h5>
+        <p class="phrase-text">${it[1]}</p>
+      </div>`).join('')}
+    </div>
+  </div>`).join('');
+}
+function renderContacts(){
+  const chatHtml = CONTACTS.chat.map(c=>`
+  <div class="contact-card">
+    <button class="contact-head" onclick="toggleBox(this)">
+      <span class="contact-num">${c.num}</span>
+      <span class="contact-title">${c.title}</span>
+      <span class="chev" style="margin-left:auto">▾</span>
+    </button>
+    <div class="contact-body">
+      <div class="contact-action"><b>Действие</b>${c.action}</div>
+      ${c.phrase?`<div class="block b-phrase"><h5>Готовая формулировка <button class="copy" onclick="copyPhrase(this)">Копировать</button></h5><p class="phrase-text">${c.phrase}</p></div>`:''}
+      ${c.variant?`<div class="contact-variant"><b>Развилка / дополнение</b>${c.variant}</div>`:''}
+    </div>
+  </div>`).join('');
+  const emailHtml = CONTACTS.email.map(c=>`
+  <div class="contact-card">
+    <button class="contact-head" onclick="toggleBox(this)">
+      <span class="contact-num">${c.num}</span>
+      <span class="contact-title">${c.title}</span>
+      <span class="chev" style="margin-left:auto">▾</span>
+    </button>
+    <div class="contact-body">
+      <div class="contact-action"><b>Действие</b>${c.action}</div>
+      ${c.phrase?`<div class="block b-phrase"><h5>Готовая формулировка <button class="copy" onclick="copyPhrase(this)">Копировать</button></h5><p class="phrase-text">${c.phrase}</p></div>`:''}
+      ${c.variant?`<div class="contact-variant"><b>Развилка / дополнение</b>${c.variant}</div>`:''}
+    </div>
+  </div>`).join('');
+  document.getElementById('contacts').innerHTML = `
+    <div class="contact-section">
+      <h2>📱 Сценарии в чатах (Авито, Дром, мессенджеры)</h2>
+      ${chatHtml}
+    </div>
+    <div class="contact-section">
+      <h2>📧 Сценарии по электронной почте</h2>
+      ${emailHtml}
+    </div>
+  `;
+}
+function renderStop(){
+  document.getElementById('stop').innerHTML = STOP.map((s,i)=>`
+  <div class="card stop-card">
+    <div class="stop-num">${i+1}</div>
+    <div class="stop-main">
+      <div class="stop-bad">🚫 «${s.bad}»</div>
+      <div class="stop-why">${s.why}</div>
+      ${s.good?`<div class="block b-result" style="margin:10px 0 0"><h5>Как сказать вместо этого <button class="copy" onclick="copyPhrase(this)">Копировать</button></h5><p class="phrase-text">«${s.good}»</p></div>`:''}
+    </div>
+  </div>`).join('');
+}
+function renderCheat(){
+  document.getElementById('cheat').innerHTML = CHEAT.map((c,i)=>`
+  <div class="card step">
+    <div class="step-num">${i+1}</div>
+    <div class="step-main">
+      <div class="step-title">${c.t}</div>
+      <div class="step-do">${c.d}</div>
+      ${c.p?`<div class="block b-phrase" style="margin-bottom:0"><h5>Ключевая формулировка <button class="copy" onclick="copyPhrase(this)">Копировать</button></h5><p class="phrase-text">${c.p}</p></div>`:''}
+      <span class="step-res">→ ${c.r}</span>
+    </div>
+  </div>`).join('');
+}
+function renderScore(){
+  document.getElementById('crit-list').innerHTML = CRITERIA.map(c=>`
+  <div class="crit-row">
+    <div class="crit-num">${c.n}</div>
+    <div>
+      <div class="crit-block">${c.block}<span class="crit-w">вес ${c.w}</span></div>
+      <div class="crit-text">${c.text}</div>
+      <input class="crit-comm" id="comm-${c.n}" placeholder="Комментарий / пример из звонка">
+    </div>
+    <div class="crit-score">
+      <div class="sbtns">
+        <button class="sbtn" onclick="setScore(${c.n},0,this)">0</button>
+        <button class="sbtn" onclick="setScore(${c.n},1,this)">1</button>
+        <button class="sbtn" onclick="setScore(${c.n},2,this)">2</button>
+      </div>
+      <div class="crit-pts" id="pts-${c.n}">— / ${c.w}</div>
+    </div>
+  </div>`).join('');
+  document.getElementById('critm-list').innerHTML = CRITICALS.map((m,i)=>`
+  <div class="critm-row">
+    <div>${m}</div>
+    <div class="mbtns">
+      <button class="mbtn no" onclick="setCrit(${i},false,this)">Нет</button>
+      <button class="mbtn yes" onclick="setCrit(${i},true,this)">Да</button>
+    </div>
+  </div>`).join('');
+}
+
+/* ================= ЛОГИКА ================= */
+function toggleBox(btn){ btn.closest('.stage, .item, .quick, .contact-card').classList.toggle('open'); }
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.id==='tab-'+name));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  window.scrollTo({top:0});
+}
+let activeFilter='all', query='';
+function setFilter(f){
+  activeFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active', c.dataset.f===f));
+  applyFilter();
+}
+function applyFilter(){
+  document.querySelectorAll('.item').forEach(el=>{
+    const k=el.dataset.key;
+    const okF = activeFilter==='all' || k===activeFilter || (activeFilter==='extstr' && (k==='ext'||k==='str'));
+    const okQ = !query || el.dataset.search.indexOf(query)>-1;
+    el.style.display = (okF&&okQ)?'':'none';
+    if(okF&&okQ&&(activeFilter!=='all'||query)) el.classList.add('open');
+  });
+  document.querySelectorAll('.stage').forEach(st=>{
+    const visible=[...st.querySelectorAll('.item')].some(i=>i.style.display!=='none');
+    st.style.display = visible?'':'none';
+    if(activeFilter!=='all'||query) st.classList.toggle('open', visible);
+  });
+}
+function expandAll(){
+  document.querySelectorAll('#tab-script .stage, #tab-script .item').forEach(el=>{
+    if(el.style.display!=='none') el.classList.add('open');
+  });
+}
+function collapseAll(){
+  document.querySelectorAll('#tab-script .open, #tab-quick .open, #tab-contacts .open').forEach(el=>el.classList.remove('open'));
+}
+function copyPhrase(btn){
+  const text=btn.closest('.block').querySelector('.phrase-text').innerText;
+  copyText(text,btn);
+}
+function copyText(text,btn){
+  const done=()=>{ const old=btn.textContent; btn.textContent='Скопировано ✓'; btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent=old; btn.classList.remove('ok');},1400); };
+  if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done)); }
+  else fallbackCopy(text,done);
+}
+function fallbackCopy(t,done){
+  const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){}
+  ta.remove();
+}
+/* --- оценка --- */
+const scoreState={}, critState={};
+function setScore(n,s,btn){
+  scoreState[n]=s;
+  btn.parentElement.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  recalc();
+}
+function setCrit(i,v,btn){
+  critState[i]=v;
+  btn.parentElement.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  recalcCrit();
+}
+function recalc(){
+  let total=0, filled=0;
+  CRITERIA.forEach(c=>{
+    const s=scoreState[c.n], el=document.getElementById('pts-'+c.n);
+    if(s==null){ el.textContent='— / '+c.w; }
+    else{ filled++; const p=c.w*s/2; total+=p; el.textContent=p+' / '+c.w; }
+  });
+  total=Math.round(total*10)/10;
+  document.getElementById('score-total').textContent=String(total).replace('.',',');
+  document.getElementById('score-bar').style.width=Math.min(total,100)+'%';
+  const le=document.getElementById('score-level');
+  let lvl,cls;
+  if(filled===0){lvl='Отметьте критерии';cls='lv-none';}
+  else if(total>=90){lvl='Высокий уровень звонка';cls='lv-hi';}
+  else if(total>=75){lvl='Хороший уровень звонка';cls='lv-ok';}
+  else if(total>=60){lvl='Удовлетворительно — точки роста';cls='lv-mid';}
+  else{lvl='Требуется переобучение';cls='lv-low';}
+  le.textContent=lvl; le.className='score-level '+cls;
+}
+function recalcCrit(){
+  const vals=CRITICALS.map((_,i)=>critState[i]);
+  const b=document.getElementById('crit-banner');
+  if(vals.some(v=>v===true)){ b.className='crit-banner bad'; b.textContent='⛔ Выявлены критические ошибки. Звонок подлежит детальному разбору и корректировке.'; }
+  else if(vals.every(v=>v!=null)){ b.className='crit-banner good'; b.textContent='✅ Критических ошибок нет.'; }
+  else{ b.className='crit-banner neutral'; b.textContent='Отметьте каждый пункт: были ли критические ошибки.'; }
+}
+function resetScore(){
+  Object.keys(scoreState).forEach(k=>delete scoreState[k]);
+  Object.keys(critState).forEach(k=>delete critState[k]);
+  document.querySelectorAll('.sbtn,.mbtn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.crit-comm').forEach(i=>i.value='');
+  document.getElementById('sc-comment').value='';
+  recalc(); recalcCrit();
+}
+function copySummary(){
+  const total=document.getElementById('score-total').textContent;
+  const level=document.getElementById('score-level').textContent;
+  const d=document.getElementById('sc-date').value;
+  let text='ОЦЕНКА ЗВОНКА — единый скрипт продаж ГК «Альфа-КПД»\n';
+  text+='Дата: '+(d||'—')+'\n';
+  text+='Менеджер: '+(document.getElementById('sc-manager').value||'—')+'\n';
+  text+='Проверяющий: '+(document.getElementById('sc-checker').value||'—')+'\n';
+  text+='Клиент/лид: '+(document.getElementById('sc-client').value||'—')+'\n';
+  text+='ИТОГ: '+total+' / 100 — '+level+'\n\nКРИТЕРИИ:\n';
+  CRITERIA.forEach(c=>{
+    const s=scoreState[c.n];
+    const comm=(document.getElementById('comm-'+c.n).value||'').trim();
+    text+=c.n+'. '+c.block+' — '+(s==null?'не оценено':s+'/2')+' ('+(s==null?'—':(c.w*s/2)+'/'+c.w)+' б.)'+(comm?' — '+comm:'')+'\n';
+  });
+  const yes=CRITICALS.filter((m,i)=>critState[i]===true);
+  text+='\nКРИТИЧЕСКИЕ ОШИБКИ: '+(yes.length?yes.join('; '):'нет')+'\n';
+  const cm=(document.getElementById('sc-comment').value||'').trim();
+  if(cm) text+='\nИТОГ РАЗБОРА:\n'+cm+'\n';
+  const btn=event.target;
+  copyText(text,btn);
+}
+
+/* ================= СТАРТ ================= */
+renderStages(); renderQuick(); renderTpl(); renderContacts(); renderStop(); renderCheat(); renderScore(); renderStageNav(); recalc(); recalcCrit();
+</script>
+</body>
+</html>
